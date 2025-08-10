@@ -18,6 +18,13 @@ defmodule TbTipsWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    # Clan routes
+    live "/clans/:slug", ClanLive.Show, :show
+    live "/clans/:clan_slug/events", EventLive.Index, :index
+    live "/clans/:clan_slug/events/new", EventLive.New, :new
+    live "/clans/:clan_slug/events/:id", EventLive.Show, :show
+    live "/clans/:clan_slug/events/:id/edit", EventLive.Edit, :edit
   end
 
   # Other scopes may use custom stacks.

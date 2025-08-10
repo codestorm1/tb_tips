@@ -1,0 +1,95 @@
+<div class="max-w-6xl mx-auto p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <%= @clan.name %> Events
+      </h1>
+      <p class="text-gray-600">Kingdom <%= @clan.kingdom %></p>
+    </div>
+    <div class="flex space-x-3">
+      <.link
+        navigate={~p"/clans/#{@clan.slug}"}
+        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+      >
+        &larr; Back to Clan
+      </.link>
+      <.link
+        navigate={~p"/clans/#{@clan.slug}/events/new"}
+        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Add Event
+      </.link>
+    </div>
+  </div>
+
+  <!-- Events Calendar/List -->
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <%= if @events == [] do %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 text-lg mb-4">No events scheduled yet.</p>
+        <.link
+          navigate={~p"/clans/#{@clan.slug}/events/new"}
+          class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Create First Event
+        </.link>
+      </div>
+    <% else %>
+      <div class="divide-y divide-gray-200">
+        <%= for event <- @events do %>
+          <div class="p-4 hover:bg-gray-50">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center space-x-3">
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    <.link
+                      navigate={~p"/clans/#{@clan.slug}/events/#{event.id}"}
+                      class="hover:text-blue-600"
+                    >
+                      <%= event.title %>
+                    </.link>
+                  </h3>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <%= event.event_type %>
+                  </span>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <%= Calendar.strftime(event.start_time, "%b %d, %Y") %>
+                  </span>
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <%= Calendar.strftime(event.start_time, "%I:%M %p UTC") %>
+                  </span>
+                  <%= if event.created_by_name do %>
+                    <span>Created by <%= event.created_by_name %></span>
+                  <% end %>
+                </div>
+                
+                <%= if event.description do %>
+                  <p class="text-gray-700 mt-2 text-sm"><%= event.description %></p>
+                <% end %>
+              </div>
+              
+              <div class="ml-4 flex space-x-2">
+                <.link
+                  navigate={~p"/clans/#{@clan.slug}/events/#{event.id}/edit"}
+                  class="text-blue-500 hover:underline text-sm"
+                >
+                  Edit
+                </.link>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

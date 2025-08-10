@@ -1,0 +1,21 @@
+
+<div class="max-w-2xl mx-auto p-6">
+  <div class="mb-6">
+    <.link
+      navigate={~p"/clans/#{@clan.slug}"}
+      class="text-blue-500 hover:underline flex items-center"
+    >
+      &larr; Back to <%= @clan.name %>
+    </.link>
+  </div>
+
+  <.live_component
+    module={TbTipsWeb.EventLive.FormComponent}
+    id={@event.id || :new}
+    title="Create New Event"
+    action={@action}
+    event={@event}
+    clan={@clan}
+    patch={~p"/clans/#{@clan.slug}"}
+  />
+</div>
