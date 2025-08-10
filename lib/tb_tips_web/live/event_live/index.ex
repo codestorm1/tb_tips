@@ -3,6 +3,7 @@ defmodule TbTipsWeb.EventLive.Index do
 
   alias TbTips.Clans
   alias TbTips.Events
+  import TbTipsWeb.TimeComponents
 
   @impl true
   def mount(%{"clan_slug" => slug}, _session, socket) do

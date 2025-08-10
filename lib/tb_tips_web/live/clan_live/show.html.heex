@@ -46,9 +46,7 @@
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     <%= event.event_type %>
                   </span>
-                  <span>
-                    <%= Calendar.strftime(event.start_time, "%B %d, %Y at %I:%M %p UTC") %>
-                  </span>
+                  <.tb_time datetime={event.start_time} class="inline-block" />
                   <%= if event.created_by_name do %>
                     <span>by <%= event.created_by_name %></span>
                   <% end %>
@@ -72,3 +70,4 @@
     <% end %>
   </div>
 </div>
+

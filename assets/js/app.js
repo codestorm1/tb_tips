@@ -25,11 +25,31 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/tb_tips"
 import topbar from "../vendor/topbar"
 
+let Hooks = {}
+
+Hooks.LocalTime = {
+  mounted() {
+    const utcTime = this.el.dataset.utc
+    if (utcTime) {
+      const date = new Date(utcTime)
+      const options = { 
+        weekday: 'long', 
+        month: 'short', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit'
+      }
+      const localTime = date.toLocaleDateString('en-US', options)
+      this.el.textContent = localTime
+    }
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, ...Hooks},  // Merge both hook objects
 })
 
 // Show progress bar on live navigation and form submits
@@ -80,4 +100,3 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
-

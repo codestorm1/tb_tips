@@ -34,9 +34,7 @@ defmodule TbTipsWeb.EventLive.FormComponent do
           options={Events.Event.event_types() |> Enum.map(&{&1, &1})}
         />
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <.input field={@form[:start_time]} type="datetime-local" label="Start Time (UTC)" />
-        </div>
+        <.input field={@form[:start_time]} type="datetime-local" label="Start Time (UTC)" />
 
         <.input
           field={@form[:description]}
@@ -75,6 +73,22 @@ defmodule TbTipsWeb.EventLive.FormComponent do
     changeset =
       socket.assigns.event
       |> Events.change_event(event_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign_form(socket, changeset)}
+  end
+
+  def handle_event("update_datetime", params, socket) do
+    # Extract datetime components from the custom inputs
+    datetime = build_datetime_from_params(params)
+
+    # Update the form with the new datetime
+    current_params = form_to_params(socket.assigns.form)
+    updated_params = Map.put(current_params, "start_time", datetime)
+
+    changeset =
+      socket.assigns.event
+      |> Events.change_event(updated_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign_form(socket, changeset)}
@@ -123,21 +137,48 @@ defmodule TbTipsWeb.EventLive.FormComponent do
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  # Helper function to format datetime for HTML datetime-local input
-  #  defp format_datetime_local(nil), do: ""
+  # Build datetime from custom input components
+  defp build_datetime_from_params(params) do
+    day = params["event_start_time_day"]
+    reset_hours = params["event_start_time_reset"]
 
-  # defp format_datetime_local(%DateTime{} = datetime) do
-  #   datetime
-  #   |> DateTime.to_naive()
-  #   |> NaiveDateTime.to_string()
-  #   # "YYYY-MM-DDTHH:MM" format
-  #   |> String.slice(0, 16)
-  # end
+    if day && reset_hours do
+      case Date.from_iso8601(day) do
+        {:ok, date} ->
+          # TB reset is at 8pm Cyprus time
+          # Cyprus is UTC+2 (standard) or UTC+3 (DST)
+          # So reset is at 6pm UTC (standard) or 5pm UTC (DST)
 
-  # Helper function to translate errors
-  # defp translate_error({msg, opts}) do
-  #   Enum.reduce(opts, msg, fn {key, value}, acc ->
-  #     String.replace(acc, "%{#{key}}", to_string(value))
-  #   end)
-  # end
+          # Simple DST check for Cyprus (rough approximation)
+          utc_reset_hour =
+            case date.month do
+              # DST: 8pm Cyprus = 5pm UTC
+              month when month in [4, 5, 6, 7, 8, 9] -> 17
+              # Standard: 8pm Cyprus = 6pm UTC
+              _ -> 18
+            end
+
+          # Create base datetime at reset time
+          {:ok, reset_datetime} = DateTime.new(date, Time.new!(utc_reset_hour, 0, 0), "Etc/UTC")
+
+          # Add the reset offset hours
+          {offset_hours, _} = Integer.parse(reset_hours)
+          final_datetime = DateTime.add(reset_datetime, offset_hours * 3600, :second)
+
+          DateTime.to_iso8601(final_datetime)
+
+        _ ->
+          nil
+      end
+    else
+      nil
+    end
+  end
+
+  # Convert form to params for updating
+  defp form_to_params(form) do
+    Enum.reduce(form, %{}, fn {key, field}, acc ->
+      Map.put(acc, Atom.to_string(key), field.value)
+    end)
+  end
 end
