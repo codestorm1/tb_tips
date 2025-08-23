@@ -86,7 +86,7 @@ defmodule TbTipsWeb do
       import Phoenix.HTML
       # Core UI components
       import TbTipsWeb.CoreComponents
-
+      import TbTipsWeb.TimeDisplay
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias TbTipsWeb.Layouts

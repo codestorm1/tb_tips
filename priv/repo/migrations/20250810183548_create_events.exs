@@ -3,7 +3,6 @@ defmodule TbTips.Repo.Migrations.CreateEvents do
 
   def change do
     create table(:events) do
-      add :title, :string, null: false
       add :description, :text
       add :start_time, :utc_datetime, null: false
       add :event_type, :string, null: false, default: "Custom"

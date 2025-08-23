@@ -3,7 +3,6 @@ defmodule TbTipsWeb.EventLive.Index do
 
   alias TbTips.Clans
   alias TbTips.Events
-  import TbTipsWeb.TimeComponents
 
   @impl true
   def mount(%{"clan_slug" => slug}, _session, socket) do
@@ -20,6 +19,7 @@ defmodule TbTipsWeb.EventLive.Index do
         {:ok,
          socket
          |> assign(:clan, clan)
+         |> assign(:clan_slug, slug)
          |> assign(:events, events)
          |> assign(:page_title, "#{clan.name} Events")}
     end

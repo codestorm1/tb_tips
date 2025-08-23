@@ -3,7 +3,6 @@ defmodule TbTipsWeb.EventLive.Show do
 
   alias TbTips.Clans
   alias TbTips.Events
-  import TbTipsWeb.TimeComponents
 
   @impl true
   def mount(%{"clan_slug" => slug, "id" => id}, _session, socket) do
@@ -27,8 +26,9 @@ defmodule TbTipsWeb.EventLive.Show do
           {:ok,
            socket
            |> assign(:clan, clan)
+           |> assign(:clan_slug, slug)
            |> assign(:event, event)
-           |> assign(:page_title, "#{event.title} - #{clan.name}")}
+           |> assign(:page_title, "#{event.event_type} - #{clan.name}")}
         end
     end
   end

@@ -20,7 +20,7 @@ defmodule TbTipsWeb.Router do
     get "/", PageController, :home
 
     # Clan routes
-    live "/clans/:slug", ClanLive.Show, :show
+    live "/clans/:clan_slug", ClanLive.Show, :show
     live "/clans/:clan_slug/events", EventLive.Index, :index
     live "/clans/:clan_slug/events/new", EventLive.New, :new
     live "/clans/:clan_slug/events/:id", EventLive.Show, :show

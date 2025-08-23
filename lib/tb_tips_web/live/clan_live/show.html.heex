@@ -41,12 +41,12 @@
           <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <div class="flex justify-between items-start">
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-900"><%= event.title %></h3>
+                <h3 class="text-lg font-semibold text-gray-900"><%= event.event_type %></h3>
                 <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     <%= event.event_type %>
                   </span>
-                  <.tb_time datetime={event.start_time} class="inline-block" />
+               <.tb_time datetime={event.start_time}/>
                   <%= if event.created_by_name do %>
                     <span>by <%= event.created_by_name %></span>
                   <% end %>
@@ -70,4 +70,3 @@
     <% end %>
   </div>
 </div>
-

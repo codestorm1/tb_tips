@@ -1,8 +1,7 @@
 defmodule TbTipsWeb.EventLive.Edit do
   use TbTipsWeb, :live_view
 
-  alias TbTips.Clans
-  alias TbTips.Events
+  alias TbTips.{Clans, Events}
 
   @impl true
   def mount(%{"clan_slug" => slug, "id" => id}, _session, socket) do

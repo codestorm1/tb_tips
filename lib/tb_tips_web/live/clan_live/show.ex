@@ -3,10 +3,9 @@ defmodule TbTipsWeb.ClanLive.Show do
 
   alias TbTips.Clans
   alias TbTips.Events
-  import TbTipsWeb.TimeComponents
 
   @impl true
-  def mount(%{"slug" => slug}, _session, socket) do
+  def mount(%{"clan_slug" => slug}, _session, socket) do
     case Clans.get_clan_by_slug(slug) do
       nil ->
         {:ok,
@@ -20,6 +19,7 @@ defmodule TbTipsWeb.ClanLive.Show do
         {:ok,
          socket
          |> assign(:clan, clan)
+         |> assign(:clan_slug, slug)
          |> assign(:events, events)
          |> assign(:page_title, "#{clan.name} (#{clan.kingdom})")}
     end
