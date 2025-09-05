@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :tb_tips, :reset_utc, hour: 18, minute: 0
+
 config :tb_tips,
   ecto_repos: [TbTips.Repo],
   generators: [timestamp_type: :utc_datetime]
