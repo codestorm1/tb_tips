@@ -2,31 +2,39 @@ defmodule TbTipsWeb.ClanLive.Show do
   use TbTipsWeb, :live_view
 
   alias TbTips.Clans
-  alias TbTips.Events
 
   @impl true
-  def mount(%{"clan_slug" => slug}, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
-      nil ->
-        {:ok,
-         socket
-         |> put_flash(:error, "Clan not found")
-         |> redirect(to: ~p"/")}
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash}>
+      <.header>
+        Clan {@clan.id}
+        <:subtitle>This is a clan record from your database.</:subtitle>
+        <:actions>
+          <.button navigate={~p"/clans"}>
+            <.icon name="hero-arrow-left" />
+          </.button>
+          <.button variant="primary" navigate={~p"/clans/#{@clan.slug}/edit?return_to=show"}>
+            <.icon name="hero-pencil-square" /> Edit clan
+          </.button>
+        </:actions>
+      </.header>
 
-      clan ->
-        events = Events.list_upcoming_events_for_clan(clan.id)
-
-        {:ok,
-         socket
-         |> assign(:clan, clan)
-         |> assign(:clan_slug, slug)
-         |> assign(:events, events)
-         |> assign(:page_title, "#{clan.name} (#{clan.kingdom})")}
-    end
+      <.list>
+        <:item title="Name">{@clan.name}</:item>
+        <:item title="Slug">{@clan.slug}</:item>
+        <:item title="Kingdom">{@clan.kingdom}</:item>
+        <:item title="Admin key">{@clan.admin_key}</:item>
+      </.list>
+    </Layouts.app>
+    """
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def mount(%{"clan_slug" => slug}, _session, socket) do
+    {:ok,
+     socket
+     |> assign(:page_title, "Show Clan")
+     |> assign(:clan, Clans.get_clan_by_slug!(slug))}
   end
 end

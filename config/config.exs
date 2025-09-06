@@ -7,8 +7,6 @@
 # General application configuration
 import Config
 
-config :tb_tips, :reset_utc, hour: 18, minute: 0
-
 config :tb_tips,
   ecto_repos: [TbTips.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -22,7 +20,7 @@ config :tb_tips, TbTipsWeb.Endpoint,
     layout: false
   ],
   pubsub_server: TbTips.PubSub,
-  live_view: [signing_salt: "+TGuKeUt"]
+  live_view: [signing_salt: "Idl+5pvD"]
 
 # Configures the mailer
 #

@@ -1,0 +1,14 @@
+defmodule TbTips.Repo.Migrations.CreateClans do
+  use Ecto.Migration
+
+  def change do
+    create table(:clans) do
+      add :name, :string
+      add :slug, :string
+      add :kingdom, :string
+      add :admin_key, :string
+
+      timestamps(type: :utc_datetime)
+    end
+  end
+end

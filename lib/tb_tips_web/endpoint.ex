@@ -7,7 +7,7 @@ defmodule TbTipsWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_tb_tips_key",
-    signing_salt: "ntnnZaEo",
+    signing_salt: "k2Yv53zG",
     same_site: "Lax"
   ]
 

@@ -23,7 +23,7 @@ config :tb_tips, TbTipsWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "eZKBDh4wQQU2VogwZ0qkk6hUP1bW33b3DZ1DudfZF7pnpHQkQLVsvdf6DVRv4uSX",
+  secret_key_base: "Xx8ad/MxeGhRvZq/2kHWG5/7l1BDWiw8m9I1O+XssArtxgJZJ5WvHl+nVDTqGLZw",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:tb_tips, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:tb_tips, ~w(--watch)]}
