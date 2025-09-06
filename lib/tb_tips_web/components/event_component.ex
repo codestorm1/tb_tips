@@ -36,7 +36,7 @@ defmodule TbTipsWeb.EventComponents do
       <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div class="rounded-lg bg-blue-50 border border-blue-200 p-3">
           <div class="text-xs uppercase tracking-wide text-blue-800/80">
-            Your Local Time — {tz_city(@user_tz)}
+            Time in {tz_city(@user_tz)}
           </div>
           <div class="mt-1 font-mono text-sm text-blue-900">
             <%= if @user_tz do %>

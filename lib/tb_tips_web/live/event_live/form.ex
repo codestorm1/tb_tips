@@ -50,12 +50,24 @@ defmodule TbTipsWeb.EventLive.Form do
           <.input field={@form[:event_type]} type="text" label="Event type" />
           <.input field={@form[:description]} type="textarea" label="Description" />
           <.input field={@form[:created_by_name]} type="text" label="Your name" />
+          
+    <!-- inside your form -->
+          <div class="space-y-1">
+            <label for="start_time_local" class="block text-sm font-medium text-gray-700">
+              Start time
+            </label>
 
-          <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
-          <div class="mt-1 text-xs text-gray-600">
-            Your Local Time<%= if city = tz_city(@user_tz) do %>
-              — {city}
-            <% end %>
+            <input
+              type="datetime-local"
+              id="start_time_local"
+              name="event[start_time_local]"
+              value={local_input_value(@event.start_time, @user_tz)}
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+            />
+
+            <div class="mt-1 text-xs text-gray-600">
+              Time in — {tz_city(@user_tz) || "Local"}
+            </div>
           </div>
 
           <footer class="mt-4 flex gap-2">
@@ -90,16 +102,31 @@ defmodule TbTipsWeb.EventLive.Form do
   end
 
   @impl true
+  def handle_event("validate", %{"event" => params}, socket) do
+    params =
+      params
+      |> put_start_time_utc(socket.assigns.user_tz)
+
+    changeset =
+      socket.assigns.event
+      |> Events.change_event(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, :form, to_form(changeset))}
+  end
+
+  @impl true
   def handle_event("save", %{"event" => params}, socket) do
+    params = put_start_time_utc(params, socket.assigns.user_tz)
+
     case socket.assigns.live_action do
       :edit ->
         case Events.update_event(socket.assigns.event, params) do
           {:ok, ev} ->
             {:noreply,
-             socket
-             |> put_flash(:info, "Event updated")
-             |> assign(:event, ev)
-             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
+             push_navigate(assign(socket, :event, ev),
+               to: ~p"/clans/#{socket.assigns.clan.slug}/events"
+             )}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}
@@ -110,10 +137,7 @@ defmodule TbTipsWeb.EventLive.Form do
 
         case Events.create_event(params) do
           {:ok, _ev} ->
-            {:noreply,
-             socket
-             |> put_flash(:info, "Event created")
-             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
+            {:noreply, push_navigate(socket, to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}
@@ -122,11 +146,39 @@ defmodule TbTipsWeb.EventLive.Form do
   end
 
   # ---- Helpers
-
-  # turns "America/Los_Angeles" into "Los Angeles"; returns nil when unknown
+  # "America/Los_Angeles" -> "Los Angeles"
   defp tz_city(nil), do: nil
   defp tz_city(""), do: nil
+  defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
-  defp tz_city(tz),
-    do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
+  # For the input's value attribute
+  defp local_input_value(nil, _tz), do: nil
+
+  defp local_input_value(%DateTime{} = utc, tz) do
+    tz = tz || "Etc/UTC"
+
+    utc
+    |> DateTime.shift_zone!(tz)
+    |> Calendar.strftime("%Y-%m-%dT%H:%M")
+  end
+
+  # Convert "YYYY-MM-DDTHH:MM" (local) -> UTC ISO8601 "YYYY-MM-DDTHH:MM:SSZ"
+  defp put_start_time_utc(params, tz) do
+    case Map.get(params, "start_time_local") do
+      nil ->
+        params
+
+      "" ->
+        Map.put(params, "start_time", nil)
+
+      local_str ->
+        with {:ok, naive} <- NaiveDateTime.from_iso8601(local_str <> ":00"),
+             {:ok, localdt} <- DateTime.from_naive(naive, tz || "Etc/UTC") do
+          utc = DateTime.shift_zone!(localdt, "Etc/UTC")
+          Map.put(params, "start_time", DateTime.to_iso8601(utc))
+        else
+          _ -> params
+        end
+    end
+  end
 end

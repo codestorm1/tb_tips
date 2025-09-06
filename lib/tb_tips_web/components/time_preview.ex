@@ -11,7 +11,7 @@ defmodule TbTipsWeb.Components.TimePreview do
     </div>
 
     <div class="time-preview local-time">
-      <div class="time-preview-label">Your Local Time</div>
+      <div class="time-preview-label">Time in</div>
       <div class="time-display">
         <span class="time-value" id="localTimeDisplay">Mon Aug 12 at 5:00 PM</span>
         <span class="time-zone">PDT</span>

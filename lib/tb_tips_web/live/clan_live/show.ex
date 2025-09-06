@@ -31,10 +31,23 @@ defmodule TbTipsWeb.ClanLive.Show do
   end
 
   @impl true
-  def mount(%{"clan_slug" => slug}, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Show Clan")
-     |> assign(:clan, Clans.get_clan_by_slug!(slug))}
+  def mount(%{"clan_slug" => slug} = _params, _session, socket) do
+    case Clans.get_clan_by_slug(slug) do
+      nil ->
+        {:ok,
+         socket
+         |> put_flash(:error, "Unknown clan.")
+         # or ~p"/clans" if you have a clans index
+         |> push_navigate(to: ~p"/")}
+
+      clan ->
+        socket =
+          socket
+          |> assign(:page_title, "Show Clan")
+          |> assign(:clan, clan)
+          |> assign(:clan, Clans.get_clan_by_slug!(slug))
+
+        {:ok, socket}
+    end
   end
 end

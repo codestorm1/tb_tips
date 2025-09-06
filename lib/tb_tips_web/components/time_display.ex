@@ -98,7 +98,7 @@ defmodule TbTipsWeb.TimeDisplay do
           </svg>
           <div>
             <div class="text-gray-600 text-xs uppercase tracking-wide font-medium">
-              Your Local Time
+              Time in
             </div>
             <div
               id={"detailed-local-time-#{System.unique_integer([:positive])}"}
@@ -151,7 +151,7 @@ defmodule TbTipsWeb.TimeDisplay do
       
     <!-- Local Time -->
       <div class="bg-green-50 border border-green-200 rounded-lg p-3">
-        <div class="text-sm font-medium text-green-700 mb-1">Your Local Time</div>
+        <div class="text-sm font-medium text-green-700 mb-1">Time in</div>
         <div class="flex justify-between items-center">
           <span class="text-lg font-semibold text-green-900" id="local-time-display">
             Select day and time
@@ -240,7 +240,7 @@ defmodule TbTipsWeb.TimeDisplay do
             >
               Loading...
             </div>
-            <div class="text-xs text-gray-600">Your Local Time</div>
+            <div class="text-xs text-gray-600">Time in</div>
           </div>
         </div>
       </div>

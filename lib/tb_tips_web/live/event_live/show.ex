@@ -72,7 +72,7 @@ defmodule TbTipsWeb.EventLive.Show do
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="text-xs uppercase tracking-wide text-blue-800/80">
-                    Your Local Time{if city = tz_city(@user_tz), do: " — #{city}"}
+                    Time in {if city = tz_city(@user_tz), do: " — #{city}"}
                   </div>
                   <div class="mt-1 font-mono text-lg sm:text-xl text-blue-900">
                     <%= if @user_tz do %>
