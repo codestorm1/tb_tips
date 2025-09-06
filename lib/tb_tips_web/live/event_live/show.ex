@@ -34,11 +34,6 @@ defmodule TbTipsWeb.EventLive.Show do
   end
 
   @impl true
-  def handle_event("tz", %{"tz" => tz}, socket) do
-    {:noreply, assign(socket, :user_tz, tz)}
-  end
-
-  @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
@@ -72,10 +67,12 @@ defmodule TbTipsWeb.EventLive.Show do
 
           <h3 class="mt-2 text-lg font-semibold">{@event.description || "Event"}</h3>
 
-          <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div class="mt-3">
             <div class="rounded-lg bg-blue-50 border border-blue-200 p-3">
               <div class="text-xs uppercase tracking-wide text-blue-800/80">
-                Your Local Time — {tz_city(@user_tz)}
+                Your Local Time<%= if city = tz_city(@user_tz) do %>
+                  — {city}
+                <% end %>
               </div>
               <div class="mt-1 font-mono text-sm text-blue-900">
                 <%= if @user_tz do %>
@@ -85,26 +82,12 @@ defmodule TbTipsWeb.EventLive.Show do
                   )}
                 <% else %>
                   <span
-                    id="event-show-local"
+                    id={"event-#{@event.id}-local"}
                     phx-hook="LocalTime"
                     data-utc={DateTime.to_iso8601(@event.start_time)}
                   >
                   </span>
-
-                  <span
-                    id="event-show-countdown"
-                    phx-hook="EventCountdown"
-                    data-utc={DateTime.to_iso8601(@event.start_time)}
-                  >
-                  </span>
                 <% end %>
-              </div>
-            </div>
-
-            <div class="rounded-lg bg-gray-50 border border-gray-200 p-3">
-              <div class="text-xs uppercase tracking-wide text-gray-700/80">UTC</div>
-              <div class="mt-1 font-mono text-sm text-gray-900">
-                {Calendar.strftime(@event.start_time, "%a %Y-%m-%d %H:%M")} UTC
               </div>
             </div>
           </div>
@@ -124,6 +107,16 @@ defmodule TbTipsWeb.EventLive.Show do
     </Layouts.app>
     """
   end
+
+  @impl true
+  def handle_event("tz", %{"tz" => tz}, socket) do
+    {:noreply, assign(socket, :user_tz, tz)}
+  end
+
+  # Return nil when unknown so we don't show " — Local"
+  defp tz_city(nil), do: nil
+  defp tz_city(""), do: nil
+  defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
   # turns "America/Los_Angeles" into "Los Angeles"
   defp tz_city(nil), do: "Unknown timezone"
