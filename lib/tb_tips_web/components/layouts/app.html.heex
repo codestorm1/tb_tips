@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-neutral-50 text-gray-900 antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-10 border-b bg-white/80 backdrop-blur">
+    <div class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+      <a href={~p"/"} class="font-semibold tracking-tight">Total Battle Event Scheduler</a>
+      <nav class="flex items-center gap-4 text-sm text-gray-600">
+        <!-- add links or leave empty -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Flash (inline, no CoreComponents dependency) -->
+  <div class="mx-auto max-w-5xl px-4 pt-4 space-y-2">
+    <%= if msg = Phoenix.Flash.get(@flash, :info) do %>
+      <div class="rounded-md bg-blue-50 border border-blue-200 text-blue-900 px-3 py-2 text-sm">
+        <%= msg %>
+      </div>
+    <% end %>
+    <%= if msg = Phoenix.Flash.get(@flash, :error) do %>
+      <div class="rounded-md bg-red-50 border border-red-200 text-red-900 px-3 py-2 text-sm">
+        <%= msg %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Page content -->
+  <main class="mx-auto max-w-5xl px-4 py-6">
+    <%= @inner_content %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mx-auto max-w-5xl px-4 py-8 text-xs text-gray-400">
+    © <%= Date.utc_today().year %> Total Battle Event Scheduler
+  </footer>
+</div>

@@ -6,27 +6,25 @@ defmodule TbTipsWeb.ClanLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        Clan {@clan.id}
-        <:subtitle>This is a clan record from your database.</:subtitle>
-        <:actions>
-          <.button navigate={~p"/clans"}>
-            <.icon name="hero-arrow-left" />
-          </.button>
-          <.button variant="primary" navigate={~p"/clans/#{@clan.slug}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit clan
-          </.button>
-        </:actions>
-      </.header>
+    <.header>
+      Clan {@clan.id}
+      <:subtitle>This is a clan record from your database.</:subtitle>
+      <:actions>
+        <.button navigate={~p"/clans"}>
+          <.icon name="hero-arrow-left" />
+        </.button>
+        <.button variant="primary" navigate={~p"/clans/#{@clan.slug}/edit?return_to=show"}>
+          <.icon name="hero-pencil-square" /> Edit clan
+        </.button>
+      </:actions>
+    </.header>
 
-      <.list>
-        <:item title="Name">{@clan.name}</:item>
-        <:item title="Slug">{@clan.slug}</:item>
-        <:item title="Kingdom">{@clan.kingdom}</:item>
-        <:item title="Admin key">{@clan.admin_key}</:item>
-      </.list>
-    </Layouts.app>
+    <.list>
+      <:item title="Name">{@clan.name}</:item>
+      <:item title="Slug">{@clan.slug}</:item>
+      <:item title="Kingdom">{@clan.kingdom}</:item>
+      <:item title="Admin key">{@clan.admin_key}</:item>
+    </.list>
     """
   end
 

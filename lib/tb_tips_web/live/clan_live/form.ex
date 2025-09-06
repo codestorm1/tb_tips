@@ -7,23 +7,21 @@ defmodule TbTipsWeb.ClanLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        {@page_title}
-        <:subtitle>Use this form to manage clan records in your database.</:subtitle>
-      </.header>
+    <.header>
+      {@page_title}
+      <:subtitle>Use this form to manage clan records in your database.</:subtitle>
+    </.header>
 
-      <.form for={@form} id="clan-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:slug]} type="text" label="Slug" />
-        <.input field={@form[:kingdom]} type="text" label="Kingdom" />
-        <.input field={@form[:admin_key]} type="text" label="Admin key" />
-        <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Clan</.button>
-          <.button navigate={return_path(@return_to, @clan)}>Cancel</.button>
-        </footer>
-      </.form>
-    </Layouts.app>
+    <.form for={@form} id="clan-form" phx-change="validate" phx-submit="save">
+      <.input field={@form[:name]} type="text" label="Name" />
+      <.input field={@form[:slug]} type="text" label="Slug" />
+      <.input field={@form[:kingdom]} type="text" label="Kingdom" />
+      <.input field={@form[:admin_key]} type="text" label="Admin key" />
+      <footer>
+        <.button phx-disable-with="Saving..." variant="primary">Save Clan</.button>
+        <.button navigate={return_path(@return_to, @clan)}>Cancel</.button>
+      </footer>
+    </.form>
     """
   end
 

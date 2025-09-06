@@ -34,41 +34,39 @@ defmodule TbTipsWeb.EventLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div id="event-form-page" phx-hook="TzSender">
-        <.header>
-          {@page_title}
-          <:subtitle>for {@clan.name}</:subtitle>
-          <:actions>
-            <.button navigate={~p"/clans/#{@clan.slug}/events"}>
-              <.icon name="hero-arrow-left" /> Back
-            </.button>
-          </:actions>
-        </.header>
+    <div id="event-form-page" phx-hook="TzSender">
+      <.header>
+        {@page_title}
+        <:subtitle>for {@clan.name}</:subtitle>
+        <:actions>
+          <.button navigate={~p"/clans/#{@clan.slug}/events"}>
+            <.icon name="hero-arrow-left" /> Back
+          </.button>
+        </:actions>
+      </.header>
 
-        <.form for={@form} id="event-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:event_type]} type="text" label="Event type" />
-          <.input field={@form[:description]} type="textarea" label="Description" />
-          <.input field={@form[:created_by_name]} type="text" label="Your name" />
+      <.form for={@form} id="event-form" phx-change="validate" phx-submit="save" class="space-y-4">
+        <.input field={@form[:event_type]} type="text" label="Event type" />
+        <.input field={@form[:description]} type="textarea" label="Description" />
+        <.input field={@form[:created_by_name]} type="text" label="Your name" />
 
-          <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
-          <div class="mt-1 text-xs text-gray-600">
-            Your Local Time<%= if city = tz_city(@user_tz) do %>
-              — {city}
-            <% end %>
-          </div>
+        <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
+        <div class="mt-1 text-xs text-gray-600">
+          Your Local Time<%= if city = tz_city(@user_tz) do %>
+            — {city}
+          <% end %>
+        </div>
 
-          <footer class="mt-4 flex gap-2">
-            <.button variant="primary" phx-disable-with="Saving...">
-              <.icon name="hero-check" /> Save Event
-            </.button>
-            <.button navigate={~p"/clans/#{@clan.slug}/events"} type="button">
-              Cancel
-            </.button>
-          </footer>
-        </.form>
-      </div>
-    </Layouts.app>
+        <footer class="mt-4 flex gap-2">
+          <.button variant="primary" phx-disable-with="Saving...">
+            <.icon name="hero-check" /> Save Event
+          </.button>
+          <.button navigate={~p"/clans/#{@clan.slug}/events"} type="button">
+            Cancel
+          </.button>
+        </footer>
+      </.form>
+    </div>
     """
   end
 
