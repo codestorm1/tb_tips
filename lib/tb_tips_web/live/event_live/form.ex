@@ -1,36 +1,70 @@
 defmodule TbTipsWeb.EventLive.Form do
   use TbTipsWeb, :live_view
 
-  alias TbTips.Events
+  alias TbTips.{Events, Clans}
   alias TbTips.Events.Event
 
   @impl true
-  def mount(_params, _session, socket),
-    do: {:ok, assign(socket, :user_tz, nil)}
+  def mount(params, _session, socket) do
+    # Always have a default so first render never blows up
+    socket = assign_new(socket, :user_tz, fn -> nil end)
+
+    clan = Clans.get_clan_by_slug!(params["clan_slug"])
+
+    {event, changeset, page_title, live_action} =
+      case params do
+        %{"id" => id} ->
+          ev = Events.get_event!(id)
+          {ev, Events.change_event(ev), "Edit Event", :edit}
+
+        _ ->
+          ev = %Event{clan_id: clan.id}
+          {ev, Events.change_event(ev), "New Event", :new}
+      end
+
+    {:ok,
+     socket
+     |> assign(:clan, clan)
+     |> assign(:event, event)
+     |> assign(:form, to_form(changeset))
+     |> assign(:page_title, page_title)
+     |> assign(:live_action, live_action)}
+  end
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <div id="page" phx-hook="TzSender">
+      <div id="event-form-page" phx-hook="TzSender">
         <.header>
           {@page_title}
-          <:subtitle>Create an event for {@clan.name}</:subtitle>
+          <:subtitle>for {@clan.name}</:subtitle>
+          <:actions>
+            <.button navigate={~p"/clans/#{@clan.slug}/events"}>
+              <.icon name="hero-arrow-left" /> Back
+            </.button>
+          </:actions>
         </.header>
 
-        <.form for={@form} id="event-form" phx-change="validate" phx-submit="save">
+        <.form for={@form} id="event-form" phx-change="validate" phx-submit="save" class="space-y-4">
           <.input field={@form[:event_type]} type="text" label="Event type" />
-          <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
-
-          <div class="mt-1 text-xs text-gray-600">
-            Your Local Time — {tz_city(@user_tz)}
-          </div>
-
           <.input field={@form[:description]} type="textarea" label="Description" />
           <.input field={@form[:created_by_name]} type="text" label="Your name" />
-          <footer>
-            <.button phx-disable-with="Saving..." variant="primary">Save Event</.button>
-            <.button navigate={return_path(@return_to)}>Cancel</.button>
+
+          <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
+          <div class="mt-1 text-xs text-gray-600">
+            Your Local Time<%= if city = tz_city(@user_tz) do %>
+              — {city}
+            <% end %>
+          </div>
+
+          <footer class="mt-4 flex gap-2">
+            <.button variant="primary" phx-disable-with="Saving...">
+              <.icon name="hero-check" /> Save Event
+            </.button>
+            <.button navigate={~p"/clans/#{@clan.slug}/events"} type="button">
+              Cancel
+            </.button>
           </footer>
         </.form>
       </div>
@@ -38,97 +72,60 @@ defmodule TbTipsWeb.EventLive.Form do
     """
   end
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    event = Events.get_event!(id)
+  # ---- Events
 
-    # Verify event belongs to this clan
-    if event.clan_id != socket.assigns.clan.id do
-      socket
-      |> put_flash(:error, "Event not found")
-      |> redirect(to: ~p"/clans/#{socket.assigns.clan.slug}/events")
-    else
-      socket
-      |> assign(:page_title, "Edit Event")
-      |> assign(:event, event)
-      |> assign(:form, to_form(Events.change_event(event)))
-    end
-  end
-
-  defp apply_action(socket, :new, _params) do
-    event = %Event{}
-
-    socket
-    |> assign(:page_title, "New Event")
-    |> assign(:event, event)
-    |> assign(:form, to_form(Events.change_event(event)))
+  @impl true
+  def handle_event("tz", %{"tz" => tz}, socket) do
+    {:noreply, assign(socket, :user_tz, tz)}
   end
 
   @impl true
-  def handle_event("validate", %{"event" => event_params}, socket) do
-    changeset = Events.change_event(socket.assigns.event, event_params)
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  def handle_event("validate", %{"event" => params}, socket) do
+    changeset =
+      socket.assigns.event
+      |> Events.change_event(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, :form, to_form(changeset))}
   end
 
-  def handle_event("save", %{"event" => event_params}, socket) do
-    save_event(socket, socket.assigns.live_action, event_params)
-  end
+  @impl true
+  def handle_event("save", %{"event" => params}, socket) do
+    case socket.assigns.live_action do
+      :edit ->
+        case Events.update_event(socket.assigns.event, params) do
+          {:ok, ev} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Event updated")
+             |> assign(:event, ev)
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
 
-  def handle_event("tz", %{"tz" => tz}, socket),
-    do: {:noreply, assign(socket, :user_tz, tz)}
+          {:error, cs} ->
+            {:noreply, assign(socket, :form, to_form(cs))}
+        end
 
-  defp save_event(socket, :edit, event_params) do
-    case Events.update_event(socket.assigns.event, event_params) do
-      {:ok, event} ->
-        path =
-          case socket.assigns.return_to do
-            "show" -> ~p"/clans/#{socket.assigns.clan.slug}/events/#{event}"
-            _ -> ~p"/clans/#{socket.assigns.clan.slug}/events"
-          end
+      :new ->
+        params = Map.put(params, "clan_id", socket.assigns.clan.id)
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "Event updated successfully")
-         |> push_navigate(to: path)}
+        case Events.create_event(params) do
+          {:ok, _ev} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Event created")
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+          {:error, cs} ->
+            {:noreply, assign(socket, :form, to_form(cs))}
+        end
     end
   end
 
-  defp save_event(socket, :new, event_params) do
-    # Auto-set the clan_id for new events
-    event_params = Map.put(event_params, "clan_id", socket.assigns.clan.id)
+  # ---- Helpers
 
-    case Events.create_event(event_params) do
-      {:ok, event} ->
-        path =
-          case socket.assigns.return_to do
-            "show" -> ~p"/clans/#{socket.assigns.clan.slug}/events/#{event}"
-            _ -> ~p"/clans/#{socket.assigns.clan.slug}/events"
-          end
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "Event created successfully")
-         |> push_navigate(to: path)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
-  end
-
-  defp return_path("index") do
-    # This is used for the Cancel button - we need to handle this differently
-    # For now, just return to clans index
-    ~p"/clans"
-  end
-
-  defp return_path("show") do
-    ~p"/clans"
-  end
-
-  defp tz_city(nil), do: "Local"
-  defp tz_city(""), do: "Local"
+  # turns "America/Los_Angeles" into "Los Angeles"; returns nil when unknown
+  defp tz_city(nil), do: nil
+  defp tz_city(""), do: nil
 
   defp tz_city(tz),
     do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")

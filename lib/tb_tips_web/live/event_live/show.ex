@@ -69,25 +69,32 @@ defmodule TbTipsWeb.EventLive.Show do
 
           <div class="mt-3">
             <div class="rounded-lg bg-blue-50 border border-blue-200 p-3">
-              <div class="text-xs uppercase tracking-wide text-blue-800/80">
-                Your Local Time<%= if city = tz_city(@user_tz) do %>
-                  — {city}
-                <% end %>
-              </div>
-              <div class="mt-1 font-mono text-sm text-blue-900">
-                <%= if @user_tz do %>
-                  {Calendar.strftime(
-                    DateTime.shift_zone!(@event.start_time, @user_tz),
-                    "%a %Y-%m-%d %H:%M"
-                  )}
-                <% else %>
-                  <span
-                    id={"event-#{@event.id}-local"}
-                    phx-hook="LocalTime"
-                    data-utc={DateTime.to_iso8601(@event.start_time)}
-                  >
-                  </span>
-                <% end %>
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-xs uppercase tracking-wide text-blue-800/80">
+                    Your Local Time{if city = tz_city(@user_tz), do: " — #{city}"}
+                  </div>
+                  <div class="mt-1 font-mono text-lg sm:text-xl text-blue-900">
+                    <%= if @user_tz do %>
+                      {Calendar.strftime(
+                        DateTime.shift_zone!(@event.start_time, @user_tz),
+                        "%a %Y-%m-%d %H:%M"
+                      )}
+                    <% else %>
+                      <span
+                        id={"event-#{@event.id}-local"}
+                        phx-hook="LocalTime"
+                        data-utc={DateTime.to_iso8601(@event.start_time)}
+                      >
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+
+                <span class="inline-flex items-center rounded-xl bg-blue-600 text-white px-3 py-1 text-base sm:text-lg font-semibold tracking-tight">
+                  {TbTips.Time.ResetClock.offset_from_start_utc(@event.start_time)
+                  |> TbTips.Time.ResetClock.format_r_label()}
+                </span>
               </div>
             </div>
           </div>

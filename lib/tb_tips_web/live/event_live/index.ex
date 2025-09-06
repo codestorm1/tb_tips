@@ -26,9 +26,38 @@ defmodule TbTipsWeb.EventLive.Index do
         row_click={fn {_id, event} -> JS.navigate(~p"/clans/#{@clan.slug}/events/#{event}") end}
       >
         <:col :let={{_id, event}} label="Event Type">{event.event_type}</:col>
+
         <:col :let={{_id, event}} label="When">
-          <TbTipsWeb.TimeDisplay.tb_time datetime={event.start_time} />
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex flex-col">
+              <span class="font-mono">
+                <%= if @user_tz do %>
+                  {Calendar.strftime(
+                    DateTime.shift_zone!(event.start_time, @user_tz),
+                    "%a, %b %-d, %I:%M %p"
+                  )} — {tz_city(@user_tz)}
+                <% else %>
+                  <span
+                    id={"event-#{event.id}-local"}
+                    phx-hook="LocalTime"
+                    data-utc={DateTime.to_iso8601(event.start_time)}
+                  >
+                  </span>
+                <% end %>
+              </span>
+            </div>
+
+            <span
+              class="inline-flex items-center rounded-xl bg-blue-600 text-white px-3 py-1
+                 text-base sm:text-lg font-semibold tracking-tight"
+              title="Offset from RESET (10:00 Los Angeles)"
+            >
+              {TbTips.Time.ResetClock.offset_from_start_utc(event.start_time)
+              |> TbTips.Time.ResetClock.format_r_label()}
+            </span>
+          </div>
         </:col>
+
         <:col :let={{_id, event}} label="Created By">{event.created_by_name}</:col>
         <:col :let={{_id, event}} label="Description">{event.description}</:col>
         <:action :let={{_id, event}}>
@@ -82,4 +111,11 @@ defmodule TbTipsWeb.EventLive.Index do
       {:noreply, put_flash(socket, :error, "Cannot delete event from another clan")}
     end
   end
+
+  # turns "America/Los_Angeles" into "Los Angeles"
+  defp tz_city(nil), do: nil
+  defp tz_city(""), do: nil
+
+  defp tz_city(tz),
+    do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 end

@@ -1,28 +1,22 @@
+# lib/tb_tips/time/reset_clock.ex
 defmodule TbTips.Time.ResetClock do
-  @moduledoc "TB RESET anchored to a fixed UTC time. No DST."
-  def reset_time_utc,
-    do:
-      (
-        cfg = Application.get_env(:tb_tips, :reset_utc, hour: 18, minute: 0)
-        elem(Time.new(cfg[:hour], cfg[:minute], 0), 1)
-      )
+  @tz "America/Los_Angeles"
+  # 10:00 LA, DST-aware
+  @reset_local ~T[10:00:00]
 
   def reset_at_utc(date) do
-    {:ok, dt} = DateTime.new(date, reset_time_utc(), "Etc/UTC")
-    dt
+    {:ok, local} = DateTime.new(date, @reset_local, @tz)
+    DateTime.shift_zone!(local, "Etc/UTC")
   end
 
-  # Minutes since the most recent RESET before/at start_utc
   def offset_from_start_utc(%DateTime{} = start) do
-    start_utc = (start.time_zone == "Etc/UTC" && start) || DateTime.shift_zone!(start, "Etc/UTC")
-    date = DateTime.to_date(start_utc)
+    start_utc =
+      if start.time_zone == "Etc/UTC", do: start, else: DateTime.shift_zone!(start, "Etc/UTC")
 
-    base_date =
-      if Time.compare(DateTime.to_time(start_utc), reset_time_utc()) == :lt,
-        do: Date.add(date, -1),
-        else: date
-
-    DateTime.diff(start_utc, reset_at_utc(base_date), :minute)
+    la = DateTime.shift_zone!(start_utc, @tz)
+    game_date = DateTime.to_date(la)
+    reset_utc = reset_at_utc(game_date)
+    DateTime.diff(start_utc, reset_utc, :minute)
   end
 
   def format_r_label(off) do
