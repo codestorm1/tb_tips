@@ -6,7 +6,6 @@ defmodule TbTipsWeb.EventLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
-    # Always have a default so first render never blows up
     socket = assign_new(socket, :user_tz, fn -> nil end)
 
     clan = Clans.get_clan_by_slug!(params["clan_slug"])
@@ -50,8 +49,7 @@ defmodule TbTipsWeb.EventLive.Form do
           <.input field={@form[:event_type]} type="text" label="Event type" />
           <.input field={@form[:description]} type="textarea" label="Description" />
           <.input field={@form[:created_by_name]} type="text" label="Your name" />
-          
-    <!-- inside your form -->
+
           <div class="space-y-1">
             <label for="start_time_local" class="block text-sm font-medium text-gray-700">
               Start time
@@ -66,7 +64,7 @@ defmodule TbTipsWeb.EventLive.Form do
             />
 
             <div class="mt-1 text-xs text-gray-600">
-              Time in — {tz_city(@user_tz) || "Local"}
+              Time in {tz_city(@user_tz) || "Local"}
             </div>
           </div>
 

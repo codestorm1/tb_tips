@@ -25,6 +25,8 @@ defmodule TbTipsWeb.Router do
     live "/clans/:clan_slug/edit", ClanLive.Form, :edit
 
     live "/clans/:clan_slug/events", EventLive.Index, :index
+    # list view without edit controls
+    live "/clans/:clan_slug/schedule", EventLive.Index, :public
     live "/clans/:clan_slug/events/new", EventLive.Form, :new
     live "/clans/:clan_slug/events/:id", EventLive.Show, :show
     live "/clans/:clan_slug/events/:id/edit", EventLive.Form, :edit

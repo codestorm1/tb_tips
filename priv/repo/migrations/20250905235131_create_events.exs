@@ -13,5 +13,6 @@ defmodule TbTips.Repo.Migrations.CreateEvents do
     end
 
     create index(:events, [:clan_id])
+    create index(:events, [:clan_id, :start_time])
   end
 end

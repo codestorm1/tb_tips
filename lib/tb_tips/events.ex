@@ -7,22 +7,33 @@ defmodule TbTips.Events do
   alias TbTips.Repo
   alias TbTips.Events.Event
 
-  @doc """
-  Returns the list of events.
-  """
-  def list_events do
-    Repo.all(Event)
+  # --- Default ordering for Event everywhere: earliest first, NILs last
+  defp ordered(query \\ Event) do
+    from e in query,
+      order_by: [asc: is_nil(e.start_time), asc: e.start_time, asc: e.id]
+
+    # If you're on Ecto >= 3.9 with Postgres, you can use:
+    # from e in query, order_by: [asc_nulls_last: e.start_time, asc: e.id]
   end
 
-  @doc """
-  Returns events for a specific clan.
-  """
+  # Use the default order in all list functions:
+
+  def list_events do
+    Event |> ordered() |> Repo.all()
+  end
+
   def list_events_for_clan(clan_id) do
-    from(e in Event,
-      where: e.clan_id == ^clan_id,
-      order_by: [asc: e.start_time]
-    )
+    Event
+    |> where([e], e.clan_id == ^clan_id)
+    |> ordered()
     |> Repo.all()
+  end
+
+  # If you expose a base query for composition:
+  def events_query_for_clan(clan_id) do
+    Event
+    |> where([e], e.clan_id == ^clan_id)
+    |> ordered()
   end
 
   @doc """
