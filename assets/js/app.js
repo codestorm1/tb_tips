@@ -27,32 +27,33 @@ import topbar from "../vendor/topbar"
 
 // Custom hooks for time display components
 const Hooks = {
-  LocalTime: {
-    mounted() {
-      this.updateLocalTime()
-    },
-    updated() {
-      this.updateLocalTime()
-    },
-    updateLocalTime() {
-      const utcTime = this.el.dataset.utc
-      if (utcTime) {
-        try {
-          const date = new Date(utcTime)
-          const options = {
-            weekday: 'short',
-            month: 'short', 
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit'
-          }
-          this.el.textContent = date.toLocaleDateString('en-US', options)
-        } catch (e) {
-          this.el.textContent = "Invalid date"
+LocalTime: {
+  mounted() {
+    this.updateLocalTime()
+  },
+  updated() {
+    this.updateLocalTime()
+  },
+  updateLocalTime() {
+    const utcTime = this.el.dataset.utc
+    if (utcTime) {
+      try {
+        const date = new Date(utcTime)
+        const options = {
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZoneName: 'short'  // Add this line
         }
+        this.el.textContent = date.toLocaleDateString('en-US', options)
+      } catch (e) {
+        this.el.textContent = "Invalid date"
       }
     }
-  },
+  }
+},
 
   EventCountdown: {
     mounted() {
