@@ -1,52 +1,42 @@
 defmodule TbTipsWeb.EventLive.Form do
   use TbTipsWeb, :live_view
 
-  alias TbTips.{Events, Clans}
+  alias TbTips.Events
   alias TbTips.Events.Event
+
+  @impl true
+  def mount(_params, _session, socket),
+    do: {:ok, assign(socket, :user_tz, nil)}
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <.header>
-        {@page_title}
-        <:subtitle>Create an event for {@clan.name}</:subtitle>
-      </.header>
+      <div id="page" phx-hook="TzSender">
+        <.header>
+          {@page_title}
+          <:subtitle>Create an event for {@clan.name}</:subtitle>
+        </.header>
 
-      <.form for={@form} id="event-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:event_type]} type="text" label="Event type" />
-        <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
-        <.input field={@form[:description]} type="textarea" label="Description" />
-        <.input field={@form[:created_by_name]} type="text" label="Your name" />
-        <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Event</.button>
-          <.button navigate={return_path(@return_to)}>Cancel</.button>
-        </footer>
-      </.form>
+        <.form for={@form} id="event-form" phx-change="validate" phx-submit="save">
+          <.input field={@form[:event_type]} type="text" label="Event type" />
+          <.input field={@form[:start_time]} type="datetime-local" label="Start time" />
+
+          <div class="mt-1 text-xs text-gray-600">
+            Your Local Time — {tz_city(@user_tz)}
+          </div>
+
+          <.input field={@form[:description]} type="textarea" label="Description" />
+          <.input field={@form[:created_by_name]} type="text" label="Your name" />
+          <footer>
+            <.button phx-disable-with="Saving..." variant="primary">Save Event</.button>
+            <.button navigate={return_path(@return_to)}>Cancel</.button>
+          </footer>
+        </.form>
+      </div>
     </Layouts.app>
     """
   end
-
-  @impl true
-  def mount(%{"clan_slug" => slug} = params, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
-      nil ->
-        {:ok,
-         socket
-         |> put_flash(:error, "Clan not found")
-         |> redirect(to: ~p"/clans")}
-
-      clan ->
-        {:ok,
-         socket
-         |> assign(:clan, clan)
-         |> assign(:return_to, return_to(params["return_to"]))
-         |> apply_action(socket.assigns.live_action, params)}
-    end
-  end
-
-  defp return_to("show"), do: "show"
-  defp return_to(_), do: "index"
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     event = Events.get_event!(id)
@@ -82,6 +72,9 @@ defmodule TbTipsWeb.EventLive.Form do
   def handle_event("save", %{"event" => event_params}, socket) do
     save_event(socket, socket.assigns.live_action, event_params)
   end
+
+  def handle_event("tz", %{"tz" => tz}, socket),
+    do: {:noreply, assign(socket, :user_tz, tz)}
 
   defp save_event(socket, :edit, event_params) do
     case Events.update_event(socket.assigns.event, event_params) do
@@ -133,4 +126,10 @@ defmodule TbTipsWeb.EventLive.Form do
   defp return_path("show") do
     ~p"/clans"
   end
+
+  defp tz_city(nil), do: "Local"
+  defp tz_city(""), do: "Local"
+
+  defp tz_city(tz),
+    do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 end

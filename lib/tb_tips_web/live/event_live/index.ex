@@ -56,12 +56,14 @@ defmodule TbTipsWeb.EventLive.Index do
       nil ->
         {:ok,
          socket
+         |> assign(:user_tz, nil)
          |> put_flash(:error, "Clan not found")
          |> redirect(to: ~p"/clans")}
 
       clan ->
         {:ok,
          socket
+         |> assign(:user_tz, nil)
          |> assign(:page_title, "#{clan.name} Events")
          |> assign(:clan, clan)
          |> stream(:events, Events.list_events_for_clan(clan.id))}
