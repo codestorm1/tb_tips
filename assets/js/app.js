@@ -25,11 +25,103 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/tb_tips"
 import topbar from "../vendor/topbar"
 
+// Custom hooks for time display components
+const Hooks = {
+  LocalTime: {
+    mounted() {
+      this.updateLocalTime()
+    },
+    updated() {
+      this.updateLocalTime()
+    },
+    updateLocalTime() {
+      const utcTime = this.el.dataset.utc
+      if (utcTime) {
+        try {
+          const date = new Date(utcTime)
+          const options = {
+            weekday: 'short',
+            month: 'short', 
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+          }
+          this.el.textContent = date.toLocaleDateString('en-US', options)
+        } catch (e) {
+          this.el.textContent = "Invalid date"
+        }
+      }
+    }
+  },
+
+  EventCountdown: {
+    mounted() {
+      this.startCountdown()
+    },
+    updated() {
+      this.startCountdown()
+    },
+    destroyed() {
+      if (this.interval) {
+        clearInterval(this.interval)
+      }
+    },
+    startCountdown() {
+      const utcTime = this.el.dataset.utc
+      if (utcTime) {
+        try {
+          const targetDate = new Date(utcTime)
+          
+          const updateCountdown = () => {
+            const now = new Date()
+            const diff = targetDate - now
+            
+            if (diff <= 0) {
+              this.el.textContent = "Event started!"
+              return
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+            
+            if (days > 0) {
+              this.el.textContent = `${days}d ${hours}h ${minutes}m`
+            } else if (hours > 0) {
+              this.el.textContent = `${hours}h ${minutes}m`
+            } else {
+              this.el.textContent = `${minutes}m`
+            }
+          }
+          
+          updateCountdown()
+          this.interval = setInterval(updateCountdown, 60000) // Update every minute
+        } catch (e) {
+          this.el.textContent = "Invalid date"
+        }
+      }
+    }
+  },
+
+  TimePreview: {
+    mounted() {
+      this.initializeTimePreview()
+    },
+    updated() {
+      this.initializeTimePreview()
+    },
+    initializeTimePreview() {
+      // This hook can be used for form time previews if needed
+      // Currently just a placeholder for future functionality
+    }
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, ...Hooks},
 })
 
 // Show progress bar on live navigation and form submits
@@ -80,4 +172,3 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
-

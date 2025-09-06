@@ -26,7 +26,9 @@ defmodule TbTipsWeb.EventLive.Index do
         row_click={fn {_id, event} -> JS.navigate(~p"/clans/#{@clan.slug}/events/#{event}") end}
       >
         <:col :let={{_id, event}} label="Event Type">{event.event_type}</:col>
-        <:col :let={{_id, event}} label="Start Time">{event.start_time}</:col>
+        <:col :let={{_id, event}} label="When">
+          <TbTipsWeb.TimeDisplay.tb_time datetime={event.start_time} />
+        </:col>
         <:col :let={{_id, event}} label="Created By">{event.created_by_name}</:col>
         <:col :let={{_id, event}} label="Description">{event.description}</:col>
         <:action :let={{_id, event}}>
