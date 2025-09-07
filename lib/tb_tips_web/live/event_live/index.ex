@@ -34,8 +34,8 @@ defmodule TbTipsWeb.EventLive.Index do
       </div>
 
       <section class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <!-- header -->
-        <div class="grid grid-cols-12 items-center gap-3 bg-gray-50 px-5 py-2.5 text-xs font-medium text-gray-600">
+        <!-- Desktop Table Header (hidden on mobile) -->
+        <div class="hidden md:grid grid-cols-12 items-center gap-3 bg-gray-50 px-5 py-2.5 text-xs font-medium text-gray-600">
           <div class="col-span-2">Event</div>
           <div class="col-span-4">When</div>
           <div class="col-span-2">Countdown</div>
@@ -45,9 +45,10 @@ defmodule TbTipsWeb.EventLive.Index do
 
         <div class="divide-y divide-gray-200">
           <%= for event <- @events do %>
+            <!-- Desktop Table Row (hidden on mobile) -->
             <div
-              id={"event-#{event.id}"}
-              class="grid grid-cols-12 items-start gap-3 px-5 py-4 hover:bg-gray-50"
+              id={"event-#{event.id}-desktop"}
+              class="hidden md:grid grid-cols-12 items-start gap-3 px-5 py-4 hover:bg-gray-50"
             >
               <!-- Event -->
               <div class="col-span-2 min-w-0">
@@ -64,7 +65,7 @@ defmodule TbTipsWeb.EventLive.Index do
                 </.link>
               </div>
               
-    <!-- When: time on first line, city below -->
+    <!-- When -->
               <div class="col-span-4 min-w-0">
                 <div class="flex items-start gap-3">
                   <span
@@ -102,9 +103,9 @@ defmodule TbTipsWeb.EventLive.Index do
                 </div>
               </div>
               
-    <!-- Description: multi-line, bullets if the text uses "* " -->
+    <!-- Description -->
               <div class="col-span-3 min-w-0 text-sm text-gray-800">
-                <.description_cell text={event.description} max_lines={2} />
+                <.description_cell text={event.description} max_lines={8} />
               </div>
               
     <!-- Actions -->
@@ -128,6 +129,87 @@ defmodule TbTipsWeb.EventLive.Index do
                   <span class="text-gray-400">—</span>
                 <% end %>
               </div>
+            </div>
+            
+    <!-- Mobile Card Layout (hidden on desktop) -->
+            <div
+              id={"event-#{event.id}-mobile"}
+              class="block md:hidden p-4 hover:bg-gray-50"
+            >
+              <.link
+                navigate={~p"/clans/#{@clan.slug}/events/#{event.id}"}
+                class="block"
+              >
+                <!-- Event Header -->
+                <div class="flex items-start justify-between mb-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800">
+                        {event.event_type}
+                      </span>
+                      <span class="inline-flex items-center rounded-xl bg-blue-600 px-2 py-1 text-xs font-semibold text-white">
+                        {TbTips.Time.ResetClock.offset_from_start_utc(event.start_time)
+                        |> TbTips.Time.ResetClock.format_r_label()}
+                      </span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      by {event.created_by_name}
+                    </div>
+                  </div>
+                  
+    <!-- Countdown -->
+                  <div
+                    id={"countdown-mobile-#{event.id}"}
+                    class={[countdown_style(event.start_time), "ml-3"]}
+                    phx-hook="EventCountdown"
+                    data-utc={DateTime.to_iso8601(event.start_time)}
+                  >
+                    Calculating...
+                  </div>
+                </div>
+                
+    <!-- Time Display -->
+                <div class="mb-3">
+                  <div class="flex items-center text-sm text-gray-900">
+                    <span
+                      id={"t-mobile-#{event.id}"}
+                      phx-hook="LocalTime"
+                      data-utc={DateTime.to_iso8601(event.start_time)}
+                      class="font-mono"
+                    >
+                    </span>
+                    <span class="text-xs text-gray-500 ml-2">
+                      {tz_city(@user_tz) || "Local"} Time
+                    </span>
+                  </div>
+                </div>
+                
+    <!-- Description (mobile optimized) -->
+                <%= if event.description && String.trim(event.description) != "" do %>
+                  <div class="text-sm text-gray-700 mb-3">
+                    <.description_cell text={event.description} max_lines={2} />
+                  </div>
+                <% end %>
+              </.link>
+              
+    <!-- Mobile Actions -->
+              <%= if @is_admin do %>
+                <div class="flex items-center gap-4 pt-3 border-t border-gray-100">
+                  <.link
+                    navigate={~p"/clans/#{@clan.slug}/events/#{event.id}/edit"}
+                    class="text-sm text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </.link>
+                  <.link
+                    phx-click={JS.push("delete", value: %{id: event.id})}
+                    data-confirm="Delete this event?"
+                    class="text-sm text-red-600 hover:underline"
+                  >
+                    Delete
+                  </.link>
+                </div>
+              <% end %>
             </div>
           <% end %>
 
