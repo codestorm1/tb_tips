@@ -83,7 +83,7 @@ defmodule TbTipsWeb.EventLive.Index do
                         >
                         </span>
                         <span class="text-xs text-gray-500 mt-0.5">
-                          Time in {tz_city(@user_tz) || "Local"}
+                          {tz_city(@user_tz) || "Local"} Time
                         </span>
                       </div>
                     </div>
