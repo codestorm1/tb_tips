@@ -68,7 +68,7 @@ defmodule TbTipsWeb.EventLive.Index do
                     <div class="flex items-start gap-3">
                       <span
                         class="inline-flex items-center rounded-xl bg-blue-600 px-3 py-1 text-sm font-semibold text-white"
-                        title="Offset from RESET (10:00 Los Angeles)"
+                        title="Offset from RESET (8:00PM Cyprus)"
                       >
                         {TbTips.Time.ResetClock.offset_from_start_utc(event.start_time)
                         |> TbTips.Time.ResetClock.format_r_label()}
@@ -83,7 +83,7 @@ defmodule TbTipsWeb.EventLive.Index do
                         >
                         </span>
                         <span class="text-xs text-gray-500 mt-0.5">
-                          {tz_city(@user_tz) || "Local"}
+                          Time in {tz_city(@user_tz) || "Local"}
                         </span>
                       </div>
                     </div>
