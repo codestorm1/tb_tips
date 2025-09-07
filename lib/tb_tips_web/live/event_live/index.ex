@@ -36,77 +36,79 @@ defmodule TbTipsWeb.EventLive.Index do
       <section class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <!-- header -->
         <div class="grid grid-cols-12 items-center gap-3 bg-gray-50 px-5 py-2.5 text-xs font-medium text-gray-600">
-          <div class="col-span-3">Event</div>
-          <div class="col-span-5">When</div>
+          <div class="col-span-2">Event</div>
+          <div class="col-span-4">When</div>
+          <div class="col-span-2">Countdown</div>
           <div class="col-span-3">Description</div>
           <div class="col-span-1 text-right">Actions</div>
         </div>
 
         <div class="divide-y divide-gray-200">
           <%= for event <- @events do %>
-            <!-- Taller rows to accommodate multi-line description -->
             <div
               id={"event-#{event.id}"}
               class="grid grid-cols-12 items-start gap-3 px-5 py-4 hover:bg-gray-50"
             >
-              <!-- Left 11 cols hold the clickable area -->
-              <div class="col-span-11 relative min-w-0">
-                <!-- Content grid inside: 3/5/3 tracks; min-w-0 allows wrapping without overflow -->
-                <div class="grid grid-cols-11 gap-3 relative z-10 min-w-0">
-                  <!-- Event -->
-                  <div class="col-span-3 min-w-0">
-                    <div class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800">
-                      {event.event_type}
-                    </div>
-                    <div class="mt-1 text-xs text-gray-500">
-                      by <span class="text-gray-800">{event.created_by_name}</span>
-                    </div>
-                  </div>
-                  
-    <!-- When: time on first line, city below -->
-                  <div class="col-span-5 min-w-0">
-                    <div class="flex items-start gap-3">
-                      <span
-                        class="inline-flex items-center rounded-xl bg-blue-600 px-3 py-1 text-sm font-semibold text-white"
-                        title="Offset from RESET (8:00PM Cyprus)"
-                      >
-                        {TbTips.Time.ResetClock.offset_from_start_utc(event.start_time)
-                        |> TbTips.Time.ResetClock.format_r_label()}
-                      </span>
-
-                      <div class="flex flex-col leading-tight">
-                        <span
-                          id={"t-#{event.id}"}
-                          phx-hook="LocalTime"
-                          data-utc={DateTime.to_iso8601(event.start_time)}
-                          class="font-mono text-sm text-gray-900 whitespace-nowrap"
-                        >
-                        </span>
-                        <span class="text-xs text-gray-500 mt-0.5">
-                          {tz_city(@user_tz) || "Local"} Time
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-    <!-- Description: multi-line, bullets if the text uses "* " -->
-                  <div class="col-span-3 min-w-0 text-sm text-gray-800">
-                    <.description_cell text={event.description} max_lines={8} />
-                  </div>
-                </div>
-                
-    <!-- Invisible overlay link to make most of the row clickable -->
+              <!-- Event -->
+              <div class="col-span-2 min-w-0">
                 <.link
                   navigate={~p"/clans/#{@clan.slug}/events/#{event.id}"}
-                  aria-label={"Open event #{event.id}"}
-                  class="absolute inset-0 z-0 block"
+                  class="block hover:underline"
                 >
-                  <span class="sr-only">Open</span>
+                  <div class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800">
+                    {event.event_type}
+                  </div>
+                  <div class="mt-1 text-xs text-gray-500">
+                    by <span class="text-gray-800">{event.created_by_name}</span>
+                  </div>
                 </.link>
               </div>
               
-    <!-- Actions (kept above the overlay for reliable clicks) -->
-              <div class="col-span-1 text-right text-sm relative z-20">
+    <!-- When: time on first line, city below -->
+              <div class="col-span-4 min-w-0">
+                <div class="flex items-start gap-3">
+                  <span
+                    class="inline-flex items-center rounded-xl bg-blue-600 px-3 py-1 text-sm font-semibold text-white"
+                    title="Offset from RESET (8:00PM Cyprus)"
+                  >
+                    {TbTips.Time.ResetClock.offset_from_start_utc(event.start_time)
+                    |> TbTips.Time.ResetClock.format_r_label()}
+                  </span>
+
+                  <div class="flex flex-col leading-tight">
+                    <span
+                      id={"t-#{event.id}"}
+                      phx-hook="LocalTime"
+                      data-utc={DateTime.to_iso8601(event.start_time)}
+                      class="font-mono text-sm text-gray-900 whitespace-nowrap"
+                    >
+                    </span>
+                    <span class="text-xs text-gray-500 mt-0.5">
+                      {tz_city(@user_tz) || "Local"} Time
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+    <!-- Countdown -->
+              <div class="col-span-2 min-w-0">
+                <div
+                  id={"countdown-#{event.id}"}
+                  class={countdown_style(event.start_time)}
+                  phx-hook="EventCountdown"
+                  data-utc={DateTime.to_iso8601(event.start_time)}
+                >
+                  Calculating...
+                </div>
+              </div>
+              
+    <!-- Description: multi-line, bullets if the text uses "* " -->
+              <div class="col-span-3 min-w-0 text-sm text-gray-800">
+                <.description_cell text={event.description} max_lines={8} />
+              </div>
+              
+    <!-- Actions -->
+              <div class="col-span-1 text-right text-sm">
                 <%= if @is_admin do %>
                   <.link
                     navigate={~p"/clans/#{@clan.slug}/events/#{event.id}/edit"}
@@ -205,6 +207,12 @@ defmodule TbTipsWeb.EventLive.Index do
   defp tz_city(""), do: nil
   defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
+  defp within_24_hours?(start_time) do
+    now = DateTime.utc_now()
+    diff_hours = DateTime.diff(start_time, now, :hour)
+    diff_hours >= 0 and diff_hours <= 24
+  end
+
   # === Description cell (function component) ================================
 
   attr :text, :string, default: nil
@@ -266,5 +274,36 @@ defmodule TbTipsWeb.EventLive.Index do
 
   defp strip_bullet(line) do
     String.replace(line, ~r/^\s*([*•-])\s+/, "")
+  end
+
+  defp countdown_style(start_time) do
+    now = DateTime.utc_now()
+    diff_minutes = DateTime.diff(start_time, now, :minute)
+
+    cond do
+      # Event started but still ongoing (within 30 minutes)
+      diff_minutes <= 0 and diff_minutes >= -30 ->
+        "font-medium text-green-700 bg-green-100 px-2 py-1 rounded border-green-300 border text-sm"
+
+      # Event ended (more than 30 minutes ago)
+      diff_minutes < -30 ->
+        "text-gray-400 text-sm line-through"
+
+      # Imminent (15 minutes or less)
+      diff_minutes <= 15 and diff_minutes > 0 ->
+        "font-bold text-white bg-red-600 px-3 py-1 rounded-full text-sm animate-pulse"
+
+      # Urgent (30 minutes or less)
+      diff_minutes <= 30 and diff_minutes > 0 ->
+        "font-bold text-red-700 bg-red-100 px-2 py-1 rounded border-red-300 border text-sm"
+
+      # Soon (1 hour or less)
+      diff_minutes <= 60 and diff_minutes > 0 ->
+        "font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded text-sm"
+
+      # Future events
+      true ->
+        "text-gray-600 text-sm"
+    end
   end
 end
