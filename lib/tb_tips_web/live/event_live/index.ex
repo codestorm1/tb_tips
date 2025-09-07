@@ -29,7 +29,7 @@ defmodule TbTipsWeb.EventLive.Index do
           >
             + New Event
           </.link>
-          <.link navigate={~p"/clans/#{@clan.slug}"} class="btn btn-ghost">← Back to Clan</.link>
+          <%!-- <.link navigate={~p"/clans/#{@clan.slug}"} class="btn btn-ghost">← Back to Clan</.link> --%>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ defmodule TbTipsWeb.EventLive.Index do
               
     <!-- Description: multi-line, bullets if the text uses "* " -->
               <div class="col-span-3 min-w-0 text-sm text-gray-800">
-                <.description_cell text={event.description} max_lines={8} />
+                <.description_cell text={event.description} max_lines={2} />
               </div>
               
     <!-- Actions -->

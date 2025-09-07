@@ -25,9 +25,9 @@ defmodule TbTips.Time.ResetClock do
 
     base =
       cond do
-        h > 0 -> "R+#{h}"
-        h < 0 -> "R#{h}"
-        true -> "R"
+        h > 0 -> "Reset+#{h}"
+        h < 0 -> "Reset#{h}"
+        true -> "Reset"
       end
 
     if m == 0 or off == 0,
