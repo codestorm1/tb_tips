@@ -9,14 +9,15 @@ defmodule TbTipsWeb.EventLive.Index do
   @impl LiveView
   def mount(%{"clan_slug" => slug}, _session, socket) do
     case Clans.get_clan_by_slug(slug) do
-      # existing error handling
       nil ->
-        {:ok, socket}
+        {:ok,
+         socket
+         |> put_flash(:error, "Clan not found")
+         |> redirect(to: ~p"/clans")}
 
       clan ->
         events = Events.list_events_for_clan(clan.id)
 
-        # Subscribe to real-time updates for this clan
         if connected?(socket) do
           Phoenix.PubSub.subscribe(TbTips.PubSub, "clan:#{clan.id}")
         end
@@ -25,13 +26,13 @@ defmodule TbTipsWeb.EventLive.Index do
          socket
          |> assign(:user_tz, nil)
          |> assign(:clan, clan)
-         #  |> assign(:is_admin, is_admin)
-         #  |> assign(:page_title, page_title(is_admin, clan.name))
+         |> assign(:is_admin, true)
+         |> assign(:page_title, "#{clan.name} Events")
          |> assign(:events, events)}
     end
   end
 
-  @impl true
+  @impl LiveView
   def render(assigns) do
     ~H"""
     <!-- send browser IANA TZ once -->
@@ -249,23 +250,31 @@ defmodule TbTipsWeb.EventLive.Index do
     """
   end
 
-  @impl true
+  @impl LiveView
   def handle_params(_params, _uri, socket) do
-    is_admin = socket.assigns.live_action != :public
+    # Only proceed if clan was successfully assigned in mount
+    case socket.assigns do
+      %{clan: clan} ->
+        is_admin = socket.assigns.live_action != :public
 
-    {:noreply,
-     socket
-     |> assign(:is_admin, is_admin)
-     |> assign(:page_title, page_title(is_admin, socket.assigns.clan.name))}
+        {:noreply,
+         socket
+         |> assign(:is_admin, is_admin)
+         |> assign(:page_title, page_title(is_admin, clan.name))}
+
+      _ ->
+        # No clan assigned, just return socket as-is
+        {:noreply, socket}
+    end
   end
 
   # Browser tz from app.js Hook
-  @impl true
+  @impl LiveView
   def handle_event("tz", %{"tz" => tz}, socket) do
     {:noreply, assign(socket, :user_tz, tz)}
   end
 
-  @impl true
+  @impl LiveView
   def handle_event("delete", %{"id" => id}, socket) do
     if socket.assigns.is_admin do
       event = Events.get_event!(id)
