@@ -339,12 +339,13 @@ defmodule TbTipsWeb.EventLive.Index do
     """
   end
 
-  # In your LiveView
-  @spec handle_info({:event_updated, any()}, Phoenix.LiveView.Socket.t()) ::
-          {:noreply, Phoenix.LiveView.Socket.t()}
-  @impl LiveView
+  @impl true
   def handle_info({:event_updated, event}, socket) do
-    {:noreply, stream_insert(socket, :events, event)}
+    updated_events =
+      socket.assigns.events
+      |> Enum.map(fn e -> if e.id == event.id, do: event, else: e end)
+
+    {:noreply, assign(socket, :events, updated_events)}
   end
 
   # Helpers for description parsing
