@@ -17,7 +17,7 @@ defmodule TbTipsWeb.ClanLive.Form do
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:slug]} type="text" label="Slug" />
         <.input field={@form[:kingdom]} type="text" label="Kingdom" />
-        <.input field={@form[:admin_key]} type="text" label="Admin key" />
+        <.input field={@form[:invite_key]} type="text" label="Invite key" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Clan</.button>
           <.button navigate={return_path(@return_to, @clan)}>Cancel</.button>

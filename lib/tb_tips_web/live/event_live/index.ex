@@ -292,6 +292,16 @@ defmodule TbTipsWeb.EventLive.Index do
     end
   end
 
+  @impl LiveView
+  def handle_info({:event_created, event}, socket) do
+    if event.clan_id == socket.assigns.clan.id do
+      events = Events.list_events_for_clan(socket.assigns.clan.id)
+      {:noreply, assign(socket, :events, events)}
+    else
+      {:noreply, socket}
+    end
+  end
+
   defp page_title(true, clan_name), do: "#{clan_name} Events"
   defp page_title(false, clan_name), do: "#{clan_name} Schedule"
 

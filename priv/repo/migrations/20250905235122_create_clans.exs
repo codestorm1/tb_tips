@@ -6,7 +6,7 @@ defmodule TbTips.Repo.Migrations.CreateClans do
       add :name, :string
       add :slug, :string
       add :kingdom, :string
-      add :admin_key, :string
+      add :invite_key, :string
 
       timestamps(type: :utc_datetime)
     end

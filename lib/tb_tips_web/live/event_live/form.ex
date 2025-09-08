@@ -91,9 +91,7 @@ defmodule TbTipsWeb.EventLive.Form do
 
   @impl true
   def handle_event("validate", %{"event" => params}, socket) do
-    params =
-      params
-      |> put_start_time_utc(socket.assigns.user_tz)
+    params = put_start_time_utc(params, socket.assigns.user_tz)
 
     changeset =
       socket.assigns.event
@@ -105,16 +103,26 @@ defmodule TbTipsWeb.EventLive.Form do
 
   @impl true
   def handle_event("save", %{"event" => params}, socket) do
-    params = put_start_time_utc(params, socket.assigns.user_tz)
+    params =
+      params
+      |> put_start_time_utc(socket.assigns.user_tz)
+      |> maybe_add_user_id(socket.assigns[:current_user])
 
     case socket.assigns.live_action do
       :edit ->
         case Events.update_event(socket.assigns.event, params) do
           {:ok, ev} ->
+            # Broadcast the update
+            Phoenix.PubSub.broadcast(
+              TbTips.PubSub,
+              "clan:#{socket.assigns.clan.id}",
+              {:event_updated, ev}
+            )
+
             {:noreply,
-             push_navigate(assign(socket, :event, ev),
-               to: ~p"/clans/#{socket.assigns.clan.slug}/events"
-             )}
+             socket
+             |> put_flash(:info, "Event updated successfully")
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}
@@ -124,8 +132,18 @@ defmodule TbTipsWeb.EventLive.Form do
         params = Map.put(params, "clan_id", socket.assigns.clan.id)
 
         case Events.create_event(params) do
-          {:ok, _ev} ->
-            {:noreply, push_navigate(socket, to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
+          {:ok, ev} ->
+            # Broadcast the new event
+            Phoenix.PubSub.broadcast(
+              TbTips.PubSub,
+              "clan:#{socket.assigns.clan.id}",
+              {:event_created, ev}
+            )
+
+            {:noreply,
+             socket
+             |> put_flash(:info, "Event created successfully")
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}
@@ -134,10 +152,6 @@ defmodule TbTipsWeb.EventLive.Form do
   end
 
   # ---- Helpers
-  # "America/Los_Angeles" -> "Los Angeles"
-  # defp tz_city(nil), do: nil
-  # defp tz_city(""), do: nil
-  # defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
   # For the input's value attribute
   defp local_input_value(nil, _tz), do: nil
@@ -169,4 +183,8 @@ defmodule TbTipsWeb.EventLive.Form do
         end
     end
   end
+
+  # Add user_id if user is logged in
+  defp maybe_add_user_id(params, user) when is_nil(user), do: params
+  defp maybe_add_user_id(params, user), do: Map.put(params, "created_by_user_id", user.id)
 end

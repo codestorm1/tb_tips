@@ -8,6 +8,6 @@ Tbtips.com is live on fly.io
 * Registration
 * invite_key
 * event manager_key
-* admin key?
+
   
 * Different user types

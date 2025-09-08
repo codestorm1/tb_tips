@@ -11,7 +11,7 @@ defmodule TbTips.ClansFixtures do
     {:ok, clan} =
       attrs
       |> Enum.into(%{
-        admin_key: "some admin_key",
+        invite_key: "some invite_key",
         kingdom: "some kingdom",
         name: "some name",
         slug: "some slug"

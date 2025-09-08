@@ -3,11 +3,15 @@ defmodule TbTips.Events.Event do
   import Ecto.Changeset
 
   schema "events" do
-    field :description, :string
+    field :name, :string
     field :start_time, :utc_datetime
+    field :description, :string
     field :event_type, :string
+    # Keep this field if you have it
     field :created_by_name, :string
-    field :clan_id, :id
+
+    belongs_to :clan, TbTips.Clans.Clan
+    belongs_to :created_by_user, TbTips.Accounts.User
 
     timestamps(type: :utc_datetime)
   end
@@ -15,8 +19,20 @@ defmodule TbTips.Events.Event do
   @doc false
   def changeset(event, attrs) do
     event
-    |> cast(attrs, [:description, :start_time, :event_type, :created_by_name, :clan_id])
-    |> validate_required([:description, :start_time, :event_type, :created_by_name])
+    |> cast(attrs, [
+      :name,
+      :start_time,
+      :description,
+      :event_type,
+      :clan_id,
+      :created_by_user_id,
+      :created_by_name
+    ])
+    # name not required based on your existing code
+    |> validate_required([:start_time, :clan_id])
+    |> validate_length(:description, max: 500)
+    |> foreign_key_constraint(:clan_id)
+    |> foreign_key_constraint(:created_by_user_id)
   end
 
   # add near bottom of the schema module (public fns)

@@ -17,6 +17,13 @@ defmodule TbTips.Clans do
 
   def get_clan_by_slug(slug), do: Repo.get_by(Clan, slug: slug)
 
+  @doc """
+  Get clan by invite key
+  """
+  def get_clan_by_invite_key(invite_key) do
+    Repo.get_by(Clan, invite_key: invite_key)
+  end
+
   def create_clan(attrs \\ %{}) do
     %Clan{}
     |> Clan.changeset(attrs)

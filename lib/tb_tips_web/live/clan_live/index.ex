@@ -24,7 +24,7 @@ defmodule TbTipsWeb.ClanLive.Index do
         <:col :let={{_id, clan}} label="Name">{clan.name}</:col>
         <:col :let={{_id, clan}} label="Slug">{clan.slug}</:col>
         <:col :let={{_id, clan}} label="Kingdom">{clan.kingdom}</:col>
-        <:col :let={{_id, clan}} label="Admin key">{clan.admin_key}</:col>
+        <:col :let={{_id, clan}} label="Invite key">{clan.invite_key}</:col>
         <:action :let={{_id, clan}}>
           <div class="sr-only">
             <.link navigate={~p"/clans/#{clan.slug}"}>Show</.link>
