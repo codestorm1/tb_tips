@@ -179,7 +179,7 @@ defmodule TbTipsWeb.EventLive.Index do
                     >
                     </span>
                     <span class="text-xs text-gray-500 ml-2">
-                      {tz_city(@user_tz) || "Local"} Time
+                      {@user_tz || "Local"} Time
                     </span>
                   </div>
                 </div>
@@ -289,11 +289,11 @@ defmodule TbTipsWeb.EventLive.Index do
   defp tz_city(""), do: nil
   defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
-  defp within_24_hours?(start_time) do
-    now = DateTime.utc_now()
-    diff_hours = DateTime.diff(start_time, now, :hour)
-    diff_hours >= 0 and diff_hours <= 24
-  end
+  # defp within_24_hours?(start_time) do
+  #   now = DateTime.utc_now()
+  #   diff_hours = DateTime.diff(start_time, now, :hour)
+  #   diff_hours >= 0 and diff_hours <= 24
+  # end
 
   # === Description cell (function component) ================================
 

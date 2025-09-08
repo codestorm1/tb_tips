@@ -8,7 +8,7 @@ defmodule TbTips.Events do
   alias TbTips.Events.Event
 
   # --- Default ordering for Event everywhere: earliest first, NILs last
-  defp ordered(query \\ Event) do
+  defp ordered(query) do
     from e in query,
       order_by: [asc: is_nil(e.start_time), asc: e.start_time, asc: e.id]
 
