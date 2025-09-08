@@ -1,8 +1,35 @@
 defmodule TbTipsWeb.EventLive.Index do
+  alias Phoenix.LiveView
   use TbTipsWeb, :live_view
 
-  alias TbTips.{Events, Clans}
+  alias TbTips.Events
+  alias TbTips.Clans
   alias Phoenix.LiveView.JS
+
+  @impl LiveView
+  def mount(%{"clan_slug" => slug}, _session, socket) do
+    case Clans.get_clan_by_slug(slug) do
+      # existing error handling
+      nil ->
+        {:ok, socket}
+
+      clan ->
+        events = Events.list_events_for_clan(clan.id)
+
+        # Subscribe to real-time updates for this clan
+        if connected?(socket) do
+          Phoenix.PubSub.subscribe(TbTips.PubSub, "clan:#{clan.id}")
+        end
+
+        {:ok,
+         socket
+         |> assign(:user_tz, nil)
+         |> assign(:clan, clan)
+         #  |> assign(:is_admin, is_admin)
+         #  |> assign(:page_title, page_title(is_admin, clan.name))
+         |> assign(:events, events)}
+    end
+  end
 
   @impl true
   def render(assigns) do
@@ -223,31 +250,6 @@ defmodule TbTipsWeb.EventLive.Index do
   end
 
   @impl true
-  def mount(%{"clan_slug" => slug}, _session, socket) do
-    is_admin = socket.assigns.live_action != :public
-
-    case Clans.get_clan_by_slug(slug) do
-      nil ->
-        {:ok,
-         socket
-         |> assign(:user_tz, nil)
-         |> put_flash(:error, "Clan not found")
-         |> redirect(to: ~p"/clans")}
-
-      clan ->
-        events = Events.list_events_for_clan(clan.id)
-
-        {:ok,
-         socket
-         |> assign(:user_tz, nil)
-         |> assign(:clan, clan)
-         |> assign(:is_admin, is_admin)
-         |> assign(:page_title, page_title(is_admin, clan.name))
-         |> assign(:events, events)}
-    end
-  end
-
-  @impl true
   def handle_params(_params, _uri, socket) do
     is_admin = socket.assigns.live_action != :public
 
@@ -335,6 +337,14 @@ defmodule TbTipsWeb.EventLive.Index do
       <% end %>
     <% end %>
     """
+  end
+
+  # In your LiveView
+  @spec handle_info({:event_updated, any()}, Phoenix.LiveView.Socket.t()) ::
+          {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl LiveView
+  def handle_info({:event_updated, event}, socket) do
+    {:noreply, stream_insert(socket, :events, event)}
   end
 
   # Helpers for description parsing

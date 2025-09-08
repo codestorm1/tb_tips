@@ -9,14 +9,8 @@ defmodule TbTips.Events do
 
   # --- Default ordering for Event everywhere: earliest first, NILs last
   defp ordered(query) do
-    from e in query,
-      order_by: [asc: is_nil(e.start_time), asc: e.start_time, asc: e.id]
-
-    # If you're on Ecto >= 3.9 with Postgres, you can use:
-    # from e in query, order_by: [asc_nulls_last: e.start_time, asc: e.id]
+    from e in query, order_by: [asc_nulls_last: e.start_time, asc: e.id]
   end
-
-  # Use the default order in all list functions:
 
   def list_events do
     Event |> ordered() |> Repo.all()
@@ -57,29 +51,47 @@ defmodule TbTips.Events do
   """
   def get_event!(id), do: Repo.get!(Event, id)
 
-  @doc """
-  Creates a event.
-  """
-  def create_event(attrs \\ %{}) do
-    %Event{}
-    |> Event.changeset(attrs)
-    |> Repo.insert()
+  def create_event(attrs) do
+    case %Event{} |> Event.changeset(attrs) |> Repo.insert() do
+      {:ok, event} ->
+        Phoenix.PubSub.broadcast(TbTips.PubSub, "clan:#{event.clan_id}", {:event_created, event})
+        {:ok, event}
+
+      error ->
+        error
+    end
   end
 
-  @doc """
-  Updates a event.
-  """
-  def update_event(%Event{} = event, attrs) do
-    event
-    |> Event.changeset(attrs)
-    |> Repo.update()
+  def update_event(event, attrs) do
+    case event |> Event.changeset(attrs) |> Repo.update() do
+      {:ok, updated_event} ->
+        Phoenix.PubSub.broadcast(
+          TbTips.PubSub,
+          "clan:#{updated_event.clan_id}",
+          {:event_updated, updated_event}
+        )
+
+        {:ok, updated_event}
+
+      error ->
+        error
+    end
   end
 
-  @doc """
-  Deletes a event.
-  """
-  def delete_event(%Event{} = event) do
-    Repo.delete(event)
+  def delete_event(event) do
+    case Repo.delete(event) do
+      {:ok, deleted_event} ->
+        Phoenix.PubSub.broadcast(
+          TbTips.PubSub,
+          "clan:#{deleted_event.clan_id}",
+          {:event_deleted, deleted_event.id}
+        )
+
+        {:ok, deleted_event}
+
+      error ->
+        error
+    end
   end
 
   @doc """
