@@ -124,11 +124,4 @@ defmodule TbTipsWeb.EventLive.Show do
   defp tz_city(nil), do: nil
   defp tz_city(""), do: nil
   defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
-
-  # turns "America/Los_Angeles" into "Los Angeles"
-  defp tz_city(nil), do: "Unknown timezone"
-  defp tz_city(""), do: "Unknown timezone"
-
-  defp tz_city(tz),
-    do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 end

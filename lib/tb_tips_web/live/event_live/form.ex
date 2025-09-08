@@ -64,7 +64,7 @@ defmodule TbTipsWeb.EventLive.Form do
             />
 
             <div class="mt-1 text-xs text-gray-600">
-              Time in {tz_city(@user_tz) || "Local"}
+              Time in {@user_tz || "Local"}
             </div>
           </div>
 
@@ -87,16 +87,6 @@ defmodule TbTipsWeb.EventLive.Form do
   @impl true
   def handle_event("tz", %{"tz" => tz}, socket) do
     {:noreply, assign(socket, :user_tz, tz)}
-  end
-
-  @impl true
-  def handle_event("validate", %{"event" => params}, socket) do
-    changeset =
-      socket.assigns.event
-      |> Events.change_event(params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, :form, to_form(changeset))}
   end
 
   @impl true
@@ -145,9 +135,9 @@ defmodule TbTipsWeb.EventLive.Form do
 
   # ---- Helpers
   # "America/Los_Angeles" -> "Los Angeles"
-  defp tz_city(nil), do: nil
-  defp tz_city(""), do: nil
-  defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
+  # defp tz_city(nil), do: nil
+  # defp tz_city(""), do: nil
+  # defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
 
   # For the input's value attribute
   defp local_input_value(nil, _tz), do: nil
