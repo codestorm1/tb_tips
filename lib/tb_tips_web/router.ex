@@ -22,17 +22,18 @@ defmodule TbTipsWeb.Router do
 
     get "/", PageController, :home
 
-    live "/clans", ClanLive.Index, :index
-    live "/clans/new", ClanLive.Form, :new
-    live "/clans/:clan_slug", ClanLive.Show, :show
-    live "/clans/:clan_slug/edit", ClanLive.Form, :edit
-
-    live "/clans/:clan_slug/events", EventLive.Index, :index
-    # list view without edit controls
-    live "/clans/:clan_slug/schedule", EventLive.Index, :public
-    live "/clans/:clan_slug/events/new", EventLive.Form, :new
-    live "/clans/:clan_slug/events/:id", EventLive.Show, :show
-    live "/clans/:clan_slug/events/:id/edit", EventLive.Form, :edit
+    live_session :public_with_scope,
+      on_mount: [{TbTipsWeb.UserAuth, :mount_current_scope}] do
+      live "/clans", ClanLive.Index, :index
+      live "/clans/new", ClanLive.Form, :new
+      live "/clans/:clan_slug", ClanLive.Show, :show
+      live "/clans/:clan_slug/edit", ClanLive.Form, :edit
+      live "/clans/:clan_slug/events", EventLive.Index, :index
+      live "/clans/:clan_slug/schedule", EventLive.Index, :public
+      live "/clans/:clan_slug/events/new", EventLive.Form, :new
+      live "/clans/:clan_slug/events/:id", EventLive.Show, :show
+      live "/clans/:clan_slug/events/:id/edit", EventLive.Form, :edit
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -60,6 +61,21 @@ defmodule TbTipsWeb.Router do
   ## Authentication routes
 
   scope "/", TbTipsWeb do
+    pipe_through [:browser]
+
+    live_session :current_user,
+      on_mount: [{TbTipsWeb.UserAuth, :mount_current_scope}] do
+      live "/users/register", UserLive.Registration, :new
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/:token", UserLive.Confirmation, :new
+      live "/join/:invite_key", ClanLive.Join, :show
+    end
+
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
+  end
+
+  scope "/", TbTipsWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
@@ -69,19 +85,5 @@ defmodule TbTipsWeb.Router do
     end
 
     post "/users/update-password", UserSessionController, :update_password
-  end
-
-  scope "/", TbTipsWeb do
-    pipe_through [:browser]
-
-    live_session :current_user,
-      on_mount: [{TbTipsWeb.UserAuth, :mount_current_scope}] do
-      live "/users/register", UserLive.Registration, :new
-      live "/users/log-in", UserLive.Login, :new
-      live "/users/log-in/:token", UserLive.Confirmation, :new
-    end
-
-    post "/users/log-in", UserSessionController, :create
-    delete "/users/log-out", UserSessionController, :delete
   end
 end

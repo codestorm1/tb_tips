@@ -117,6 +117,25 @@ defmodule TbTips.Accounts.User do
     change(user, confirmed_at: now)
   end
 
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password, :terms_accepted, :privacy_accepted])
+    |> validate_required([:email, :password])
+    |> validate_acceptance(:terms_accepted, message: "You must accept the Terms and Conditions")
+    |> validate_acceptance(:privacy_accepted, message: "You must accept the Privacy Policy")
+    |> validate_email(opts)
+    |> validate_password(opts)
+    |> put_acceptance_timestamps()
+  end
+
+  defp put_acceptance_timestamps(changeset) do
+    now = DateTime.utc_now()
+
+    changeset
+    |> put_change(:terms_accepted_at, now)
+    |> put_change(:privacy_accepted_at, now)
+  end
+
   @doc """
   Verifies the password.
 

@@ -78,7 +78,7 @@ defmodule TbTips.Accounts do
   """
   def register_user(attrs) do
     %User{}
-    |> User.email_changeset(attrs)
+    |> User.registration_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -331,6 +331,10 @@ defmodule TbTips.Accounts do
   """
   def get_clan_membership(user_id, clan_id) do
     Repo.get_by(ClanMembership, user_id: user_id, clan_id: clan_id)
+  end
+
+  def change_user_registration(user, attrs \\ %{}) do
+    User.registration_changeset(user, attrs, validate_unique: false)
   end
 
   @doc """

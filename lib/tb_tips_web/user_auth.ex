@@ -40,6 +40,19 @@ defmodule TbTipsWeb.UserAuth do
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
+  @doc "Returns the path to redirect to after log in."
+  # the user was already logged in, redirect to settings
+
+  # In UserAuth.signed_in_path/1
+  def signed_in_path(conn) do
+    if pending = get_session(conn, :pending_invite) do
+      delete_session(conn, :pending_invite)
+      ~p"/join/#{pending.invite_key}"
+    else
+      ~p"/"
+    end
+  end
+
   @doc """
   Logs the user out.
 
@@ -255,14 +268,6 @@ defmodule TbTipsWeb.UserAuth do
       Scope.for_user(user)
     end)
   end
-
-  @doc "Returns the path to redirect to after log in."
-  # the user was already logged in, redirect to settings
-  def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
-    ~p"/users/settings"
-  end
-
-  def signed_in_path(_), do: ~p"/"
 
   @doc """
   Plug for routes that require the user to be authenticated.
