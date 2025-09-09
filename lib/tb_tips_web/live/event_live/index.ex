@@ -302,6 +302,15 @@ defmodule TbTipsWeb.EventLive.Index do
     end
   end
 
+  @impl LiveView
+  def handle_info({:event_updated, event}, socket) do
+    updated_events =
+      socket.assigns.events
+      |> Enum.map(fn e -> if e.id == event.id, do: event, else: e end)
+
+    {:noreply, assign(socket, :events, updated_events)}
+  end
+
   defp page_title(true, clan_name), do: "#{clan_name} Events"
   defp page_title(false, clan_name), do: "#{clan_name} Schedule"
 
@@ -356,15 +365,6 @@ defmodule TbTipsWeb.EventLive.Index do
       <% end %>
     <% end %>
     """
-  end
-
-  @impl true
-  def handle_info({:event_updated, event}, socket) do
-    updated_events =
-      socket.assigns.events
-      |> Enum.map(fn e -> if e.id == event.id, do: event, else: e end)
-
-    {:noreply, assign(socket, :events, updated_events)}
   end
 
   # Helpers for description parsing

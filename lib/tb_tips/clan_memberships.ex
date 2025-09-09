@@ -5,7 +5,7 @@ defmodule TbTips.ClanMemberships do
 
   import Ecto.Query, warn: false
   alias TbTips.Repo
-  alias TbTips.Accounts.{User, ClanMembership}
+  alias TbTips.Accounts.ClanMembership
 
   @doc """
   Create a clan membership
