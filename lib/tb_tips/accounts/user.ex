@@ -6,12 +6,15 @@ defmodule TbTips.Accounts.User do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
-    field :confirmed_at, :utc_datetime
-    field :authenticated_at, :utc_datetime, virtual: true
+    field :confirmed_at, :utc_datetime_usec
+    field :authenticated_at, :utc_datetime_usec, virtual: true
     many_to_many :clans, TbTips.Clans.Clan, join_through: "clan_memberships"
     has_many :clan_memberships, TbTips.Accounts.ClanMembership
     has_many :created_events, TbTips.Events.Event, foreign_key: :created_by_user_id
-
+    field :terms_accepted_at, :utc_datetime_usec
+    field :privacy_accepted_at, :utc_datetime_usec
+    field :terms_accepted, :boolean, virtual: true
+    field :privacy_accepted, :boolean, virtual: true
     timestamps(type: :utc_datetime_usec)
   end
 
@@ -113,7 +116,7 @@ defmodule TbTips.Accounts.User do
   Confirms the account by setting `confirmed_at`.
   """
   def confirm_changeset(user) do
-    now = DateTime.utc_now(:second)
+    now = DateTime.utc_now()
     change(user, confirmed_at: now)
   end
 

@@ -10,7 +10,7 @@ defmodule TbTips.Clans.Clan do
 
     many_to_many :users, TbTips.Accounts.User, join_through: "clan_memberships"
     has_many :clan_memberships, TbTips.Accounts.ClanMembership
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc false

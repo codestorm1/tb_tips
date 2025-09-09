@@ -6,7 +6,7 @@ defmodule TbTips.Repo.Migrations.CreateClanMemberships do
       add :user_id, references(:users, on_delete: :delete_all), null: false
       add :clan_id, references(:clans, on_delete: :delete_all), null: false
       add :role, :string, null: false, default: "member"
-      add :joined_at, :utc_datetime, default: fragment("now()")
+      add :joined_at, :utc_datetime_usec, default: fragment("now()")
 
       timestamps()
     end

@@ -8,7 +8,7 @@ defmodule TbTips.Repo.Migrations.CreateClans do
       add :kingdom, :string
       add :invite_key, :string
 
-      timestamps(type: :utc_datetime)
+      timestamps(type: :utc_datetime_usec)
     end
   end
 end

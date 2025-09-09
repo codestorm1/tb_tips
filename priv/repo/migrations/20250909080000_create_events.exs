@@ -5,13 +5,13 @@ defmodule TbTips.Repo.Migrations.CreateEvents do
     create table(:events) do
       add :name, :string
       add :description, :text
-      add :start_time, :utc_datetime
+      add :start_time, :utc_datetime_usec
       add :event_type, :string
       add :created_by_name, :string
       add :clan_id, references(:clans, on_delete: :nothing)
       add :created_by_user_id, references(:users, on_delete: :nilify_all)
 
-      timestamps(type: :utc_datetime)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create index(:events, [:clan_id])

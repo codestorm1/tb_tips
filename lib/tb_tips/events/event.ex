@@ -4,7 +4,7 @@ defmodule TbTips.Events.Event do
 
   schema "events" do
     field :name, :string
-    field :start_time, :utc_datetime
+    field :start_time, :utc_datetime_usec
     field :description, :string
     field :event_type, :string
     # Keep this field if you have it
@@ -13,7 +13,7 @@ defmodule TbTips.Events.Event do
     belongs_to :clan, TbTips.Clans.Clan
     belongs_to :created_by_user, TbTips.Accounts.User
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc false

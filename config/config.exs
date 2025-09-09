@@ -24,7 +24,7 @@ config :tb_tips, :reset_utc, hour: 18, minute: 0
 
 config :tb_tips,
   ecto_repos: [TbTips.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime_usec]
 
 # Configures the endpoint
 config :tb_tips, TbTipsWeb.Endpoint,

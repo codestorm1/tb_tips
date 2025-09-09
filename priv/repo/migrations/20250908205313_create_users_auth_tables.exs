@@ -7,9 +7,10 @@ defmodule TbTips.Repo.Migrations.CreateUsersAuthTables do
     create table(:users) do
       add :email, :citext, null: false
       add :hashed_password, :string
-      add :confirmed_at, :utc_datetime
-
-      timestamps(type: :utc_datetime)
+      add :confirmed_at, :utc_datetime_usec
+      add :terms_accepted_at, :utc_datetime_usec
+      add :privacy_accepted_at, :utc_datetime_usec
+      timestamps(type: :utc_datetime_usec)
     end
 
     create unique_index(:users, [:email])
@@ -19,9 +20,9 @@ defmodule TbTips.Repo.Migrations.CreateUsersAuthTables do
       add :token, :binary, null: false
       add :context, :string, null: false
       add :sent_to, :string
-      add :authenticated_at, :utc_datetime
+      add :authenticated_at, :utc_datetime_usec
 
-      timestamps(type: :utc_datetime, updated_at: false)
+      timestamps(type: :utc_datetime_usec, updated_at: false)
     end
 
     create index(:users_tokens, [:user_id])

@@ -8,7 +8,7 @@ defmodule TbTips.Accounts.ClanMembership do
     belongs_to :user, TbTips.Accounts.User
     belongs_to :clan, TbTips.Clans.Clan
     field :role, Ecto.Enum, values: @roles, default: :member
-    field :joined_at, :utc_datetime
+    field :joined_at, :utc_datetime_usec
 
     timestamps()
   end
