@@ -8,7 +8,6 @@ defmodule TbTips.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime_usec
     field :authenticated_at, :utc_datetime_usec, virtual: true
-    many_to_many :clans, TbTips.Clans.Clan, join_through: "clan_memberships"
     has_many :clan_memberships, TbTips.Accounts.ClanMembership
     has_many :created_events, TbTips.Events.Event, foreign_key: :created_by_user_id
     field :terms_accepted_at, :utc_datetime_usec

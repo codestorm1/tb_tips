@@ -9,7 +9,7 @@ defmodule TbTipsWeb.ClanLive.Show do
     <Layouts.app flash={@flash}>
       <.header>
         Clan {@clan.id}
-        <:subtitle>This is a clan record from your database.</:subtitle>
+        <:subtitle></:subtitle>
         <:actions>
           <.button navigate={~p"/clans"}>
             <.icon name="hero-arrow-left" />

@@ -4,7 +4,7 @@ defmodule TbTipsWeb.LiveHelpers do
   """
 
   import Phoenix.Component
-  alias TbTips.Accounts
+  alias TbTips.ClanMemberships
 
   @doc """
   Check user authorization for clan actions
@@ -12,7 +12,7 @@ defmodule TbTipsWeb.LiveHelpers do
   def authorize_clan_action(socket, clan_id, required_role) do
     user = socket.assigns.current_user
 
-    if user && Accounts.has_clan_role?(user.id, clan_id, required_role) do
+    if user && ClanMemberships.has_clan_role?(user.id, clan_id, required_role) do
       {:ok, socket}
     else
       {:error, :unauthorized}
@@ -28,7 +28,7 @@ defmodule TbTipsWeb.LiveHelpers do
         assign(socket, :user_clan_role, nil)
 
       user ->
-        membership = Accounts.get_clan_membership(user.id, clan_id)
+        membership = ClanMemberships.get_clan_membership(user.id, clan_id)
         role = if membership, do: membership.role, else: nil
         assign(socket, :user_clan_role, role)
     end
@@ -54,7 +54,7 @@ defmodule TbTipsWeb.LiveHelpers do
   def render_if_role(assigns, required_role, content_fun) do
     user_role = assigns[:user_clan_role]
 
-    if Accounts.role_sufficient?(user_role || :member, required_role) do
+    if ClanMemberships.role_sufficient?(user_role || :member, required_role) do
       content_fun.()
     else
       ~H""

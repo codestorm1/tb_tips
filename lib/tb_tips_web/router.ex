@@ -33,6 +33,7 @@ defmodule TbTipsWeb.Router do
       live "/clans/:clan_slug/events/new", EventLive.Form, :new
       live "/clans/:clan_slug/events/:id", EventLive.Show, :show
       live "/clans/:clan_slug/events/:id/edit", EventLive.Form, :edit
+      live "/clans/:clan_slug/invites", ClanLive.ManageInvites, :show
     end
   end
 

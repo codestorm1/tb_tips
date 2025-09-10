@@ -123,6 +123,15 @@ const Hooks = {
         this.pushEvent("tz", { tz })
       } catch {}
     }
+  },
+  CopyToClipboard: {
+    mounted() {
+      this.el.addEventListener("click", (e) => {
+        const input = document.getElementById("invite-link-input");
+        input.select();
+        document.execCommand('copy');
+      });
+    }
   }
 }
 

@@ -4,8 +4,18 @@ defmodule TbTipsWeb.EventLiveTest do
   import Phoenix.LiveViewTest
   import TbTips.EventsFixtures
 
-  @create_attrs %{description: "some description", start_time: "2025-09-04T23:51:00Z", event_type: "some event_type", created_by_name: "some created_by_name"}
-  @update_attrs %{description: "some updated description", start_time: "2025-09-05T23:51:00Z", event_type: "some updated event_type", created_by_name: "some updated created_by_name"}
+  @create_attrs %{
+    description: "some description",
+    start_time: "2025-09-04T23:51:00Z",
+    event_type: "some event_type",
+    created_by_name: "some created_by_name"
+  }
+  @update_attrs %{
+    description: "some updated description",
+    start_time: "2025-09-05T23:51:00Z",
+    event_type: "some updated event_type",
+    created_by_name: "some updated created_by_name"
+  }
   @invalid_attrs %{description: nil, start_time: nil, event_type: nil, created_by_name: nil}
   defp create_event(_) do
     event = event_fixture()
