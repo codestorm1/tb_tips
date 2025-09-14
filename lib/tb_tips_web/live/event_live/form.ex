@@ -1,33 +1,56 @@
 defmodule TbTipsWeb.EventLive.Form do
   use TbTipsWeb, :live_view
 
-  alias TbTips.{Events, Clans}
+  alias TbTips.Clans
+  alias TbTips.Events
+  alias TbTips.ClanMemberships
   alias TbTips.Events.Event
 
   @impl true
   def mount(params, _session, socket) do
-    socket = assign_new(socket, :user_tz, fn -> nil end)
+    case socket.assigns.current_scope do
+      nil ->
+        {:ok,
+         socket
+         |> put_flash(:error, "You must be logged in to manage events")
+         |> redirect(to: ~p"/users/log-in")}
 
-    clan = Clans.get_clan_by_slug!(params["clan_slug"])
+      %{user: user} ->
+        socket = assign_new(socket, :user_tz, fn -> nil end)
+        clan = Clans.get_clan_by_slug!(params["clan_slug"])
 
-    {event, changeset, page_title, live_action} =
-      case params do
-        %{"id" => id} ->
-          ev = Events.get_event!(id)
-          {ev, Events.change_event(ev), "Edit Event", :edit}
+        # Check authorization - only clan admins can manage events
+        if not ClanMemberships.has_clan_role?(user.id, clan.id, :admin) do
+          {:ok,
+           socket
+           |> put_flash(:error, "You don't have permission to manage events")
+           |> redirect(to: ~p"/clans/#{clan.slug}/events")}
+        else
+          {event, changeset, page_title, live_action} =
+            case params do
+              %{"id" => id} ->
+                ev = Events.get_event!(id)
+                # Verify event belongs to this clan
+                if ev.clan_id != clan.id do
+                  raise Ecto.NoResultsError
+                end
 
-        _ ->
-          ev = %Event{clan_id: clan.id}
-          {ev, Events.change_event(ev), "New Event", :new}
-      end
+                {ev, Events.change_event(ev), "Edit Event", :edit}
 
-    {:ok,
-     socket
-     |> assign(:clan, clan)
-     |> assign(:event, event)
-     |> assign(:form, to_form(changeset))
-     |> assign(:page_title, page_title)
-     |> assign(:live_action, live_action)}
+              _ ->
+                ev = %Event{clan_id: clan.id}
+                {ev, Events.change_event(ev), "New Event", :new}
+            end
+
+          {:ok,
+           socket
+           |> assign(:clan, clan)
+           |> assign(:event, event)
+           |> assign(:form, to_form(changeset))
+           |> assign(:page_title, page_title)
+           |> assign(:live_action, live_action)}
+        end
+    end
   end
 
   @impl true
@@ -103,10 +126,12 @@ defmodule TbTipsWeb.EventLive.Form do
 
   @impl true
   def handle_event("save", %{"event" => params}, socket) do
+    user = socket.assigns.current_scope.user
+
     params =
       params
       |> put_start_time_utc(socket.assigns.user_tz)
-      |> maybe_add_user_id(socket.assigns[:current_user])
+      |> maybe_add_user_id(user)
 
     case socket.assigns.live_action do
       :edit ->

@@ -26,10 +26,15 @@ defmodule TbTips.Clans do
     Repo.get_by(Clan, invite_key: invite_key)
   end
 
-  def create_clan(attrs \\ %{}) do
-    %Clan{}
-    |> Clan.changeset(attrs)
-    |> Repo.insert()
+  def create_clan(attrs \\ %{}, user) do
+    Repo.transact(fn ->
+      with {:ok, clan} <- %Clan{} |> Clan.changeset(attrs) |> Repo.insert(),
+           {:ok, _membership} <- ClanMemberships.create_clan_membership(user, clan, :admin) do
+        {:ok, clan}
+      else
+        {:error, changeset} -> {:error, changeset}
+      end
+    end)
   end
 
   def update_clan(%Clan{} = clan, attrs) do
@@ -45,8 +50,6 @@ defmodule TbTips.Clans do
   def change_clan(%Clan{} = clan, attrs \\ %{}) do
     Clan.changeset(clan, attrs)
   end
-
-  # Add these functions to lib/tb_tips/clans.ex
 
   @doc """
   Regenerate invite key for a clan (admin only)

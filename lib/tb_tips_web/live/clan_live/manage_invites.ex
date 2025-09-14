@@ -1,5 +1,3 @@
-# Add this to your clan admin page or create a separate management page
-
 defmodule TbTipsWeb.ClanLive.ManageInvites do
   use TbTipsWeb, :live_view
   alias TbTips.{Clans, ClanMemberships}

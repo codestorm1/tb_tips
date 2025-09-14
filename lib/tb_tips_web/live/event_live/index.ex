@@ -4,6 +4,7 @@ defmodule TbTipsWeb.EventLive.Index do
 
   alias TbTips.Events
   alias TbTips.Clans
+  alias TbTips.ClanMemberships
   alias Phoenix.LiveView.JS
 
   @impl LiveView
@@ -22,11 +23,14 @@ defmodule TbTipsWeb.EventLive.Index do
           Phoenix.PubSub.subscribe(TbTips.PubSub, "clan:#{clan.id}")
         end
 
+        user = socket.assigns.current_scope.user
+        is_admin = user && ClanMemberships.has_clan_role?(user.id, clan.id, :admin)
+
         {:ok,
          socket
          |> assign(:user_tz, nil)
          |> assign(:clan, clan)
-         |> assign(:is_admin, true)
+         |> assign(:is_admin, is_admin)
          |> assign(:page_title, "#{clan.name} Events")
          |> assign(:events, events)}
     end
@@ -318,12 +322,6 @@ defmodule TbTipsWeb.EventLive.Index do
   defp tz_city(nil), do: nil
   defp tz_city(""), do: nil
   defp tz_city(tz), do: tz |> String.split("/") |> List.last() |> String.replace("_", " ")
-
-  # defp within_24_hours?(start_time) do
-  #   now = DateTime.utc_now()
-  #   diff_hours = DateTime.diff(start_time, now, :hour)
-  #   diff_hours >= 0 and diff_hours <= 24
-  # end
 
   # === Description cell (function component) ================================
 

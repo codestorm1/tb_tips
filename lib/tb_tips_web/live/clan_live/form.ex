@@ -29,14 +29,32 @@ defmodule TbTipsWeb.ClanLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:return_to, return_to(params["return_to"]))
-     |> apply_action(socket.assigns.live_action, params)}
+    case socket.assigns.current_scope do
+      nil ->
+        {:ok,
+         socket
+         |> put_flash(:error, "You must be logged in to create a clan")
+         |> redirect(to: ~p"/users/log-in")}
+
+      %{user: _user} ->
+        {:ok,
+         socket
+         |> assign(:return_to, return_to(params["return_to"]))
+         |> apply_action(socket.assigns.live_action, params)}
+    end
   end
 
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
+
+  defp apply_action(socket, :edit, %{"clan_slug" => slug}) do
+    clan = Clans.get_clan_by_slug!(slug)
+
+    socket
+    |> assign(:page_title, "Edit Clan")
+    |> assign(:clan, clan)
+    |> assign(:form, to_form(Clans.change_clan(clan)))
+  end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     clan = Clans.get_clan!(id)
@@ -80,7 +98,7 @@ defmodule TbTipsWeb.ClanLive.Form do
   end
 
   defp save_clan(socket, :new, clan_params) do
-    case Clans.create_clan(clan_params) do
+    case Clans.create_clan(clan_params, socket.assigns.current_scope.user) do
       {:ok, clan} ->
         {:noreply,
          socket

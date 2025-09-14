@@ -81,6 +81,7 @@ defmodule TbTipsWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{TbTipsWeb.UserAuth, :require_authenticated}] do
+      live "/clans/new", ClanLive.Form, :new
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
     end
