@@ -15,7 +15,9 @@ defmodule TbTipsWeb.ClanLive.Form do
 
       <.form for={@form} id="clan-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:slug]} type="text" label="Slug" />
+        <%= if @live_action == :new do %>
+          <.input field={@form[:slug]} type="text" label="Slug" />
+        <% end %>
         <.input field={@form[:kingdom]} type="text" label="Kingdom" />
         <.input field={@form[:invite_key]} type="text" label="Invite key" />
         <footer>
