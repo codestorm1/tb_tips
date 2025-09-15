@@ -1,6 +1,12 @@
 defmodule TbTipsWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :tb_tips
 
+  if Mix.env() == :prod do
+    plug Plug.SSL,
+      rewrite_on: [:x_forwarded_proto],
+      host: "tbtips.com"
+  end
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.

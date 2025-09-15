@@ -86,7 +86,7 @@ defmodule TbTipsWeb.ClanLive.ManageInvites do
               <div class="space-y-2">
                 <%= for member <- recent_members(@clan.id) do %>
                   <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-900">{member.email}</span>
+                    <span class="text-gray-900">{member.display_name}</span>
                     <div class="flex items-center space-x-2">
                       <span class="text-xs px-2 py-1 bg-gray-100 rounded-full">
                         {String.capitalize(to_string(member.role))}

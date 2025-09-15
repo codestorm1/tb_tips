@@ -4,6 +4,7 @@ defmodule TbTips.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :display_name, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime_usec
@@ -121,8 +122,9 @@ defmodule TbTips.Accounts.User do
 
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :terms_accepted, :privacy_accepted])
-    |> validate_required([:email, :password])
+    |> cast(attrs, [:email, :password, :display_name, :terms_accepted, :privacy_accepted])
+    |> validate_required([:email, :password, :display_name])
+    |> validate_length(:display_name, min: 2, max: 50)
     |> validate_acceptance(:terms_accepted, message: "You must accept the Terms and Conditions")
     |> validate_acceptance(:privacy_accepted, message: "You must accept the Privacy Policy")
     |> validate_email(opts)

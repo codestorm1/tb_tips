@@ -120,8 +120,8 @@ defmodule TbTips.ClanMemberships do
       join: u in assoc(cm, :user),
       where: cm.clan_id == ^clan_id,
       select: %{
+        display_name: u.display_name,
         user_id: u.id,
-        email: u.email,
         role: cm.role,
         joined_at: cm.joined_at
       },
