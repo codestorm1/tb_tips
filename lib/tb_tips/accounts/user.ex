@@ -155,4 +155,11 @@ defmodule TbTips.Accounts.User do
     Bcrypt.no_user_verify()
     false
   end
+
+  def display_name_changeset(user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:display_name])
+    |> validate_required([:display_name])
+    |> validate_length(:display_name, min: 2, max: 50)
+  end
 end

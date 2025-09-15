@@ -52,6 +52,16 @@ defmodule TbTips.Accounts do
     User.registration_changeset(user, attrs, validate_unique: false)
   end
 
+  def update_user_display_name(user, attrs) do
+    user
+    |> User.display_name_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_user_display_name(user, attrs \\ %{}) do
+    User.display_name_changeset(user, attrs)
+  end
+
   ## Settings
 
   @doc """
