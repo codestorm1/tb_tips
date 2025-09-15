@@ -6,6 +6,7 @@ defmodule TbTips.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users) do
       add :email, :citext, null: false
+      add :display_name, :string, null: false
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime_usec
       add :terms_accepted_at, :utc_datetime_usec

@@ -1,0 +1,20 @@
+<.header>
+  New Clan
+  <:subtitle>Create a new clan</:subtitle>
+</.header>
+
+<.form :let={f} for={@changeset} action={~p"/clans"}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  
+  <.input field={f[:name]} type="text" label="Name" />
+  <.input field={f[:slug]} type="text" label="Slug" />
+  <.input field={f[:kingdom]} type="text" label="Kingdom" />
+  <.input field={f[:invite_key]} type="text" label="Invite key" />
+  
+  <div>
+    <.button type="submit">Save Clan</.button>
+    <.link href={~p"/clans"}>Cancel</.link>
+  </div>
+</.form>

@@ -30,6 +30,24 @@ defmodule TbTipsWeb.UserLive.Settings do
       <div class="divider" />
 
       <.form
+        for={@display_name_form}
+        id="display_name_form"
+        phx-submit="update_display_name"
+        phx-change="validate_display_name"
+      >
+        <.input
+          field={@display_name_form[:display_name]}
+          type="text"
+          label="Display Name"
+          placeholder="Enter your display name"
+          required
+        />
+        <.button variant="primary" phx-disable-with="Updating...">Update Display Name</.button>
+      </.form>
+
+      <div class="divider" />
+
+      <.form
         for={@password_form}
         id="password_form"
         action={~p"/users/update-password"}
@@ -84,12 +102,14 @@ defmodule TbTipsWeb.UserLive.Settings do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
+    display_name_changeset = Accounts.change_user_display_name(user, %{})
 
     socket =
       socket
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:display_name_form, to_form(display_name_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
@@ -126,6 +146,34 @@ defmodule TbTipsWeb.UserLive.Settings do
 
       changeset ->
         {:noreply, assign(socket, :email_form, to_form(changeset, action: :insert))}
+    end
+  end
+
+  def handle_event("validate_display_name", params, socket) do
+    %{"user" => user_params} = params
+
+    display_name_form =
+      socket.assigns.current_scope.user
+      |> Accounts.change_user_display_name(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, display_name_form: display_name_form)}
+  end
+
+  def handle_event("update_display_name", params, socket) do
+    %{"user" => user_params} = params
+    user = socket.assigns.current_scope.user
+
+    case Accounts.update_user_display_name(user, user_params) do
+      {:ok, updated_user} ->
+        {:noreply,
+         socket
+         |> assign(:current_scope, %{socket.assigns.current_scope | user: updated_user})
+         |> put_flash(:info, "Display name updated successfully")}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, display_name_form: to_form(changeset))}
     end
   end
 
