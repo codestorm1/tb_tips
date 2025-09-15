@@ -23,7 +23,7 @@ defmodule TbTipsWeb.EventLive.Index do
           Phoenix.PubSub.subscribe(TbTips.PubSub, "clan:#{clan.id}")
         end
 
-        user = socket.assigns.current_scope.user
+        user = socket.assigns.current_scope && socket.assigns.current_scope.user
         is_admin = user && ClanMemberships.has_clan_role?(user.id, clan.id, :admin)
 
         {:ok,
