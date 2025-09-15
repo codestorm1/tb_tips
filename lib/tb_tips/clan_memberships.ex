@@ -8,7 +8,6 @@ defmodule TbTips.ClanMemberships do
 
   import Ecto.Query, warn: false
   alias TbTips.Repo
-  alias TbTips.Accounts.ClanMembership
 
   ## Membership CRUD
 
@@ -16,8 +15,8 @@ defmodule TbTips.ClanMemberships do
   Create a clan membership
   """
   def create_clan_membership(user, clan, role \\ :member) do
-    %ClanMembership{}
-    |> ClanMembership.changeset(%{
+    %TbTips.Accounts.ClanMembership{}
+    |> TbTips.Accounts.ClanMembership.changeset(%{
       user_id: user.id,
       clan_id: clan.id,
       role: role,
@@ -30,7 +29,7 @@ defmodule TbTips.ClanMemberships do
   Get user's membership in a specific clan
   """
   def get_clan_membership(user_id, clan_id) do
-    Repo.get_by(ClanMembership, user_id: user_id, clan_id: clan_id)
+    Repo.get_by(TbTips.Accounts.ClanMembership, user_id: user_id, clan_id: clan_id)
   end
 
   @doc """
@@ -77,7 +76,8 @@ defmodule TbTips.ClanMemberships do
   """
   def update_clan_role(admin_user_id, target_user_id, clan_id, new_role) do
     with true <- has_clan_role?(admin_user_id, clan_id, :admin),
-         %ClanMembership{} = membership <- get_clan_membership(target_user_id, clan_id) do
+         %TbTips.Accounts.ClanMembership{} = membership <-
+           get_clan_membership(target_user_id, clan_id) do
       # Prevent demoting the last admin
       if membership.role == :admin and new_role != :admin do
         case count_clan_admins(clan_id) do
@@ -116,7 +116,7 @@ defmodule TbTips.ClanMemberships do
   List all members of a clan with their roles
   """
   def list_clan_members(clan_id) do
-    from(cm in ClanMembership,
+    from(cm in TbTips.Accounts.ClanMembership,
       join: u in assoc(cm, :user),
       where: cm.clan_id == ^clan_id,
       select: %{
@@ -134,7 +134,7 @@ defmodule TbTips.ClanMemberships do
   Get user's clans with their roles
   """
   def list_user_clans(user_id) do
-    from(cm in ClanMembership,
+    from(cm in TbTips.Accounts.ClanMembership,
       join: c in assoc(cm, :clan),
       where: cm.user_id == ^user_id,
       select: %{
@@ -151,12 +151,12 @@ defmodule TbTips.ClanMemberships do
 
   defp update_membership_role(membership, new_role) do
     membership
-    |> ClanMembership.changeset(%{role: new_role})
+    |> TbTips.Accounts.ClanMembership.changeset(%{role: new_role})
     |> Repo.update()
   end
 
   defp count_clan_admins(clan_id) do
-    from(cm in ClanMembership,
+    from(cm in TbTips.Accounts.ClanMembership,
       where: cm.clan_id == ^clan_id and cm.role == :admin,
       select: count(cm.id)
     )

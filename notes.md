@@ -3,11 +3,10 @@
 Mon Sept 8, 2025
 Tbtips.com is live on fly.io
 
-# TODO
 
+Mon Sept 15, 2025
+
+# DONE
 * Registration
-* invite_key
-* event manager_key
 
-  
-* Different user types
+# TODO

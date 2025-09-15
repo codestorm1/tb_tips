@@ -44,6 +44,22 @@ defmodule TbTips.Events do
     |> Repo.all()
   end
 
+  def list_user_events(user_id) do
+    now = DateTime.utc_now()
+
+    from(e in Event,
+      join: cm in TbTips.Accounts.ClanMembership,
+      on: cm.clan_id == e.clan_id,
+      join: c in TbTips.Clans.Clan,
+      on: c.id == e.clan_id,
+      where: cm.user_id == ^user_id and e.start_time >= ^now,
+      select: %{event: e, clan: c},
+      order_by: [asc_nulls_last: e.start_time],
+      limit: 10
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single event.
 
