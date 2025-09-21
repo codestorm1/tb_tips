@@ -7,7 +7,7 @@ defmodule TbTips.Events do
   alias TbTips.Repo
   alias TbTips.Events.Event
 
-  # --- Default ordering for Event everywhere: earliest first, NILs last
+  # Default ordering for Event everywhere: earliest first, NILs last
   defp ordered(query) do
     from e in query, order_by: [asc_nulls_last: e.start_time, asc: e.id]
   end
