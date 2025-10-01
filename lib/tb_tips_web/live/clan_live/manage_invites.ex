@@ -2,8 +2,8 @@ defmodule TbTipsWeb.ClanLive.ManageInvites do
   use TbTipsWeb, :live_view
   alias TbTips.{Clans, ClanMemberships}
 
-  def mount(%{"clan_slug" => slug}, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
+  def mount(%{"id" => id}, _session, socket) do
+    case Clans.get_clan(id) do
       nil ->
         {:ok, redirect(socket, to: ~p"/clans")}
 
@@ -19,7 +19,7 @@ defmodule TbTipsWeb.ClanLive.ManageInvites do
           {:ok,
            socket
            |> put_flash(:error, "You must be an admin to manage invites")
-           |> redirect(to: ~p"/clans/#{clan.slug}")}
+           |> redirect(to: ~p"/clans/#{clan.id}/")}
         end
     end
   end

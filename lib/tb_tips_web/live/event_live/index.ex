@@ -8,8 +8,8 @@ defmodule TbTipsWeb.EventLive.Index do
   alias Phoenix.LiveView.JS
 
   @impl LiveView
-  def mount(%{"clan_slug" => slug}, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
+  def mount(%{"id" => id}, _session, socket) do
+    case Clans.get_clan(id) do
       nil ->
         {:ok,
          socket
@@ -56,12 +56,12 @@ defmodule TbTipsWeb.EventLive.Index do
         <div class="flex items-center gap-2">
           <.link
             :if={@is_admin}
-            navigate={~p"/clans/#{@clan.slug}/events/new"}
+            navigate={~p"/clans/#{@clan.id}/events/new"}
             class="btn btn-primary"
           >
             + New Event
           </.link>
-          <%!-- <.link navigate={~p"/clans/#{@clan.slug}"} class="btn btn-ghost">← Back to Clan</.link> --%>
+          <%!-- <.link navigate={~p"/clans/#{@clan.id}"} class="btn btn-ghost">← Back to Clan</.link> --%>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ defmodule TbTipsWeb.EventLive.Index do
               <!-- Event -->
               <div class="col-span-2 min-w-0">
                 <.link
-                  navigate={~p"/clans/#{@clan.slug}/events/#{event.id}"}
+                  navigate={~p"/clans/#{@clan.id}/events/#{event.id}"}
                   class="block hover:underline"
                 >
                   <div class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800">
@@ -144,7 +144,7 @@ defmodule TbTipsWeb.EventLive.Index do
               <div class="col-span-1 text-right text-sm">
                 <%= if @is_admin do %>
                   <.link
-                    navigate={~p"/clans/#{@clan.slug}/events/#{event.id}/edit"}
+                    navigate={~p"/clans/#{@clan.id}/events/#{event.id}/edit"}
                     class="hover:underline"
                   >
                     Edit
@@ -169,7 +169,7 @@ defmodule TbTipsWeb.EventLive.Index do
               class="block md:hidden p-4 hover:bg-gray-50"
             >
               <.link
-                navigate={~p"/clans/#{@clan.slug}/events/#{event.id}"}
+                navigate={~p"/clans/#{@clan.id}/events/#{event.id}"}
                 class="block"
               >
                 <!-- Event Header -->
@@ -228,7 +228,7 @@ defmodule TbTipsWeb.EventLive.Index do
               <%= if @is_admin do %>
                 <div class="flex items-center gap-4 pt-3 border-t border-gray-100">
                   <.link
-                    navigate={~p"/clans/#{@clan.slug}/events/#{event.id}/edit"}
+                    navigate={~p"/clans/#{@clan.id}/events/#{event.id}/edit"}
                     class="text-sm text-blue-600 hover:underline"
                   >
                     Edit

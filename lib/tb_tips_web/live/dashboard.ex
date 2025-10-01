@@ -55,7 +55,7 @@ defmodule TbTipsWeb.DashboardLive do
                         {String.capitalize(to_string(role))}
                       </span>
                     </div>
-                    <.link navigate={~p"/clans/#{clan.slug}/events"} class="btn btn-sm">
+                    <.link navigate={~p"/clans/#{clan.id}//events"} class="btn btn-sm">
                       View Events
                     </.link>
                   </div>
@@ -85,7 +85,7 @@ defmodule TbTipsWeb.DashboardLive do
                         {Calendar.strftime(event.start_time, "%m/%d %H:%M")}
                       </p>
                     </div>
-                    <.link navigate={~p"/clans/#{clan.slug}/events/#{event.id}"} class="btn btn-sm">
+                    <.link navigate={~p"/clans/#{clan.id}//events/#{event.id}"} class="btn btn-sm">
                       View
                     </.link>
                   </div>

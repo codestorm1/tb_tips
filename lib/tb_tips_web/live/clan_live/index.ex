@@ -19,17 +19,16 @@ defmodule TbTipsWeb.ClanLive.Index do
       <.table
         id="clans"
         rows={@streams.clans}
-        row_click={fn {_id, clan} -> JS.navigate(~p"/clans/#{clan.slug}") end}
+        row_click={fn {_id, clan} -> JS.navigate(~p"/clans/#{clan.id}/") end}
       >
         <:col :let={{_id, clan}} label="Name">{clan.name}</:col>
-        <:col :let={{_id, clan}} label="Slug">{clan.slug}</:col>
         <:col :let={{_id, clan}} label="Kingdom">{clan.kingdom}</:col>
         <:col :let={{_id, clan}} label="Invite key">{clan.invite_key}</:col>
         <:action :let={{_id, clan}}>
           <div class="sr-only">
-            <.link navigate={~p"/clans/#{clan.slug}"}>Show</.link>
+            <.link navigate={~p"/clans/#{clan.id}/"}>Show</.link>
           </div>
-          <.link navigate={~p"/clans/#{clan.slug}/edit"}>Edit</.link>
+          <.link navigate={~p"/clans/#{clan.id}//edit"}>Edit</.link>
         </:action>
         <:action :let={{id, clan}}>
           <.link

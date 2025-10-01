@@ -14,7 +14,7 @@ defmodule TbTipsWeb.ClanLive.Show do
           <.button navigate={~p"/clans"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/clans/#{@clan.slug}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/clans/#{@clan.id}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit clan
           </.button>
         </:actions>
@@ -22,7 +22,6 @@ defmodule TbTipsWeb.ClanLive.Show do
 
       <.list>
         <:item title="Name">{@clan.name}</:item>
-        <:item title="Slug">{@clan.slug}</:item>
         <:item title="Kingdom">{@clan.kingdom}</:item>
         <:item title="Invite Key">{@clan.invite_key}</:item>
       </.list>
@@ -31,8 +30,8 @@ defmodule TbTipsWeb.ClanLive.Show do
   end
 
   @impl true
-  def mount(%{"clan_slug" => slug} = _params, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
+  def mount(%{"id" => id} = _params, _session, socket) do
+    case Clans.get_clan(id) do
       nil ->
         {:ok,
          socket
@@ -45,7 +44,7 @@ defmodule TbTipsWeb.ClanLive.Show do
           socket
           |> assign(:page_title, "Show Clan")
           |> assign(:clan, clan)
-          |> assign(:clan, Clans.get_clan_by_slug!(slug))
+          |> assign(:clan, Clans.get_clan!(id))
 
         {:ok, socket}
     end

@@ -6,17 +6,15 @@ defmodule TbTipsWeb.ClanLiveTest do
 
   @create_attrs %{
     name: "some name",
-    slug: "some slug",
     kingdom: "some kingdom",
     invite_key: "some invite_key"
   }
   @update_attrs %{
     name: "some updated name",
-    slug: "some updated slug",
     kingdom: "some updated kingdom",
     invite_key: "some updated invite_key"
   }
-  @invalid_attrs %{name: nil, slug: nil, kingdom: nil, invite_key: nil}
+  @invalid_attrs %{name: nil, kingdom: nil, invite_key: nil}
   defp create_clan(_) do
     clan = clan_fixture()
 

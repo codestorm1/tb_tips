@@ -15,10 +15,6 @@ defmodule TbTips.Clans do
   def get_clan!(id), do: Repo.get!(Clan, id)
   def get_clan(id), do: Repo.get(Clan, id)
 
-  def get_clan_by_slug!(slug), do: Repo.get_by!(Clan, slug: slug)
-
-  def get_clan_by_slug(slug), do: Repo.get_by(Clan, slug: slug)
-
   @doc """
   Get clan by invite key
   """

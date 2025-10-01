@@ -26,14 +26,14 @@ defmodule TbTipsWeb.Router do
       on_mount: [{TbTipsWeb.UserAuth, :mount_current_scope}] do
       live "/clans", ClanLive.Index, :index
       live "/clans/new", ClanLive.Form, :new
-      live "/clans/:clan_slug", ClanLive.Show, :show
-      live "/clans/:clan_slug/edit", ClanLive.Form, :edit
-      live "/clans/:clan_slug/events", EventLive.Index, :index
-      live "/clans/:clan_slug/schedule", EventLive.Index, :public
-      live "/clans/:clan_slug/events/new", EventLive.Form, :new
-      live "/clans/:clan_slug/events/:id", EventLive.Show, :show
-      live "/clans/:clan_slug/events/:id/edit", EventLive.Form, :edit
-      live "/clans/:clan_slug/invites", ClanLive.ManageInvites, :show
+      live "/clans/:id", ClanLive.Show, :show
+      live "/clans/:id/edit", ClanLive.Form, :edit
+      live "/clans/:id/events", EventLive.Index, :index
+      live "/clans/:id/schedule", EventLive.Index, :public
+      live "/clans/:id/invites", ClanLive.ManageInvites, :show
+      live "/clans/:clan_id/events/new", EventLive.Form, :new
+      live "/clans/:clan_id/events/:event_id", EventLive.Show, :show
+      live "/clans/:clan_id/events/:event_id/edit", EventLive.Form, :edit
     end
   end
 

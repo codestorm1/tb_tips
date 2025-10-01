@@ -15,9 +15,6 @@ defmodule TbTipsWeb.ClanLive.Form do
 
       <.form for={@form} id="clan-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
-        <%= if @live_action == :new do %>
-          <.input field={@form[:slug]} type="text" label="Slug" />
-        <% end %>
         <.input field={@form[:kingdom]} type="text" label="Kingdom" />
         <.input field={@form[:invite_key]} type="text" label="Invite key" />
         <footer>
@@ -48,15 +45,6 @@ defmodule TbTipsWeb.ClanLive.Form do
 
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
-
-  defp apply_action(socket, :edit, %{"clan_slug" => slug}) do
-    clan = Clans.get_clan_by_slug!(slug)
-
-    socket
-    |> assign(:page_title, "Edit Clan")
-    |> assign(:clan, clan)
-    |> assign(:form, to_form(Clans.change_clan(clan)))
-  end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     clan = Clans.get_clan!(id)

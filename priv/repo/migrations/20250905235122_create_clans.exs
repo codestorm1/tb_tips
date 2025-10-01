@@ -4,7 +4,6 @@ defmodule TbTips.Repo.Migrations.CreateClans do
   def change do
     create table(:clans) do
       add :name, :string
-      add :slug, :string
       add :kingdom, :string
       add :invite_key, :string
 

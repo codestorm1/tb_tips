@@ -13,8 +13,7 @@ defmodule TbTips.ClansFixtures do
       |> Enum.into(%{
         invite_key: "some invite_key",
         kingdom: "some kingdom",
-        name: "some name",
-        slug: "some slug"
+        name: "some name"
       })
       |> TbTips.Clans.create_clan()
 

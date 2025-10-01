@@ -8,7 +8,7 @@ defmodule TbTips.ClansTest do
 
     import TbTips.ClansFixtures
 
-    @invalid_attrs %{name: nil, slug: nil, kingdom: nil, invite_key: nil}
+    @invalid_attrs %{name: nil, kingdom: nil, invite_key: nil}
 
     test "list_clans/0 returns all clans" do
       clan = clan_fixture()
@@ -23,14 +23,12 @@ defmodule TbTips.ClansTest do
     test "create_clan/1 with valid data creates a clan" do
       valid_attrs = %{
         name: "some name",
-        slug: "some slug",
         kingdom: "some kingdom",
         invite_key: "some invite_key"
       }
 
       assert {:ok, %Clan{} = clan} = Clans.create_clan(valid_attrs)
       assert clan.name == "some name"
-      assert clan.slug == "some slug"
       assert clan.kingdom == "some kingdom"
       assert clan.invite_key == "some invite_key"
     end
@@ -44,14 +42,12 @@ defmodule TbTips.ClansTest do
 
       update_attrs = %{
         name: "some updated name",
-        slug: "some updated slug",
         kingdom: "some updated kingdom",
         invite_key: "some updated invite_key"
       }
 
       assert {:ok, %Clan{} = clan} = Clans.update_clan(clan, update_attrs)
       assert clan.name == "some updated name"
-      assert clan.slug == "some updated slug"
       assert clan.kingdom == "some updated kingdom"
       assert clan.invite_key == "some updated invite_key"
     end

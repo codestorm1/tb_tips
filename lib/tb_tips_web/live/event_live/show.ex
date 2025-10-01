@@ -5,23 +5,26 @@ defmodule TbTipsWeb.EventLive.Show do
   alias TbTips.Clans
 
   @impl true
-  def mount(%{"clan_slug" => slug, "id" => id}, _session, socket) do
-    case Clans.get_clan_by_slug(slug) do
+  def mount(%{"clan_id" => clan_id, "event_id" => event_id}, _session, socket) do
+    case Clans.get_clan(clan_id) do
       nil ->
+        dbg(nil)
+
         {:ok,
          socket
          |> put_flash(:error, "Clan not found")
          |> redirect(to: ~p"/clans")}
 
       clan ->
-        event = Events.get_event!(id)
-
+        dbg(clan)
+        event = Events.get_event!(event_id)
+        dbg(event)
         # Verify event belongs to this clan
         if event.clan_id != clan.id do
           {:ok,
            socket
            |> put_flash(:error, "Event not found")
-           |> redirect(to: ~p"/clans/#{clan.slug}/events")}
+           |> redirect(to: ~p"/clans/#{clan.id}//events")}
         else
           {:ok,
            socket
@@ -42,12 +45,12 @@ defmodule TbTipsWeb.EventLive.Show do
           Event {@event.id}
           <:subtitle>{@event.event_type} — {@clan.name}</:subtitle>
           <:actions>
-            <.button navigate={~p"/clans/#{@clan.slug}/events"}>
+            <.button navigate={~p"/clans/#{@clan.id}/events"}>
               <.icon name="hero-arrow-left" />
             </.button>
             <.button
               variant="primary"
-              navigate={~p"/clans/#{@clan.slug}/events/#{@event}/edit?return_to=show"}
+              navigate={~p"/clans/#{@clan.id}/events/#{@event}/edit?return_to=show"}
             >
               <.icon name="hero-pencil-square" /> Edit event
             </.button>

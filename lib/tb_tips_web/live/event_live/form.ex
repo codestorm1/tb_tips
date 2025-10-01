@@ -7,7 +7,7 @@ defmodule TbTipsWeb.EventLive.Form do
   alias TbTips.Events.Event
 
   @impl true
-  def mount(params, _session, socket) do
+  def mount(%{"clan_id" => clan_id} = params, _session, socket) do
     case socket.assigns.current_scope do
       nil ->
         {:ok,
@@ -17,29 +17,29 @@ defmodule TbTipsWeb.EventLive.Form do
 
       %{user: user} ->
         socket = assign_new(socket, :user_tz, fn -> nil end)
-        clan = Clans.get_clan_by_slug!(params["clan_slug"])
+        clan = Clans.get_clan!(clan_id)
 
         # Check authorization - only clan admins can manage events
         if not ClanMemberships.has_clan_role?(user.id, clan.id, :admin) do
           {:ok,
            socket
            |> put_flash(:error, "You don't have permission to manage events")
-           |> redirect(to: ~p"/clans/#{clan.slug}/events")}
+           |> redirect(to: ~p"/clans/#{clan.id}//events")}
         else
           {event, changeset, page_title, live_action} =
             case params do
-              %{"id" => id} ->
-                ev = Events.get_event!(id)
+              %{"event_id" => event_id} ->
+                event = Events.get_event!(event_id)
                 # Verify event belongs to this clan
-                if ev.clan_id != clan.id do
+                if event.clan_id != clan.id do
                   raise Ecto.NoResultsError
                 end
 
-                {ev, Events.change_event(ev), "Edit Event", :edit}
+                {event, Events.change_event(event), "Edit Event", :edit}
 
               _ ->
-                ev = %Event{clan_id: clan.id}
-                {ev, Events.change_event(ev), "New Event", :new}
+                event = %Event{clan_id: clan.id}
+                {event, Events.change_event(event), "New Event", :new}
             end
 
           {:ok,
@@ -62,7 +62,7 @@ defmodule TbTipsWeb.EventLive.Form do
           {@page_title}
           <:subtitle>for {@clan.name}</:subtitle>
           <:actions>
-            <.button navigate={~p"/clans/#{@clan.slug}/events"}>
+            <.button navigate={~p"/clans/#{@clan.id}/events"}>
               <.icon name="hero-arrow-left" /> Back
             </.button>
           </:actions>
@@ -95,7 +95,7 @@ defmodule TbTipsWeb.EventLive.Form do
             <.button variant="primary" phx-disable-with="Saving...">
               <.icon name="hero-check" /> Save Event
             </.button>
-            <.button navigate={~p"/clans/#{@clan.slug}/events"} type="button">
+            <.button navigate={~p"/clans/#{@clan.id}/events"} type="button">
               Cancel
             </.button>
           </footer>
@@ -147,7 +147,7 @@ defmodule TbTipsWeb.EventLive.Form do
             {:noreply,
              socket
              |> put_flash(:info, "Event updated successfully")
-             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.id}/events")}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}
@@ -168,7 +168,7 @@ defmodule TbTipsWeb.EventLive.Form do
             {:noreply,
              socket
              |> put_flash(:info, "Event created successfully")
-             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.slug}/events")}
+             |> push_navigate(to: ~p"/clans/#{socket.assigns.clan.id}/events")}
 
           {:error, cs} ->
             {:noreply, assign(socket, :form, to_form(cs))}

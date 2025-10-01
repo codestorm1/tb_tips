@@ -4,7 +4,6 @@ defmodule TbTips.Clans.Clan do
 
   schema "clans" do
     field :name, :string
-    field :slug, :string
     field :kingdom, :string
     field :invite_key, :string
 
@@ -16,7 +15,7 @@ defmodule TbTips.Clans.Clan do
   @doc false
   def changeset(clan, attrs) do
     clan
-    |> cast(attrs, [:name, :slug, :kingdom, :invite_key])
-    |> validate_required([:name, :slug, :kingdom, :invite_key])
+    |> cast(attrs, [:name, :kingdom, :invite_key])
+    |> validate_required([:name, :kingdom, :invite_key])
   end
 end
