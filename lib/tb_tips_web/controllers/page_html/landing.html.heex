@@ -1,0 +1,54 @@
+
+<div class="min-h-screen flex flex-col">
+  <!-- Hero Section -->
+  <div class="flex-1 flex items-center justify-center px-4 py-16">
+    <div class="max-w-3xl mx-auto text-center">
+      <h1 class="text-5xl font-bold text-gray-900 mb-4">
+        Coordinate Your Battle Events
+      </h1>
+      <p class="text-xl text-gray-600 mb-12">
+        Schedule and track events across your Total Battle clans
+      </p>
+      
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+        <a href={~p"/clans/search"} 
+           class="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition">
+          Find a Clan
+        </a>
+        <a href={~p"/users/register"} 
+           class="px-8 py-4 bg-gray-200 text-gray-900 text-lg font-semibold rounded-lg hover:bg-gray-300 transition">
+          Create New Clan
+        </a>
+      </div>
+
+      <!-- Features -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+        <div class="text-center">
+          <div class="text-3xl mb-2">📅</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Unified Schedule</h3>
+          <p class="text-sm text-gray-600">See all events across your clans in one place</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">🔗</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Easy Coordination</h3>
+          <p class="text-sm text-gray-600">Share schedules with simple invite links</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">🌍</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Time Zone Support</h3>
+          <p class="text-sm text-gray-600">Events display in your local time automatically</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-6 px-4 border-t">
+    <div class="max-w-7xl mx-auto text-center text-sm text-gray-600">
+      <a href={~p"/users/log-in"} class="text-blue-600 hover:underline">
+        Already have an account? Log in
+      </a>
+    </div>
+  </footer>
+</div>
