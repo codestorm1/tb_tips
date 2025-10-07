@@ -3,11 +3,21 @@ defmodule TbTips.Repo.Migrations.CreateClans do
 
   def change do
     create table(:clans) do
-      add :name, :string
-      add :kingdom, :string
+      add :kingdom, :string, null: false
+      add :abbr, :string, null: false
+      add :name, :string, null: false
       add :invite_key, :string
 
-      timestamps(type: :utc_datetime_usec)
+      timestamps()
     end
+
+    create unique_index(:clans, [:kingdom, :abbr])
+    create index(:clans, ["lower(name)"])
+
+    execute("""
+    ALTER TABLE clans
+      ADD CONSTRAINT clans_abbr_len_chk
+      CHECK (char_length(abbr) BETWEEN 1 AND 4)
+    """)
   end
 end

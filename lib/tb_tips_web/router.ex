@@ -26,6 +26,7 @@ defmodule TbTipsWeb.Router do
       on_mount: [{TbTipsWeb.UserAuth, :mount_current_scope}] do
       live "/clans", ClanLive.Index, :index
       live "/clans/new", ClanLive.Form, :new
+      live "/clans/search", ClanLive.Search, :index
       live "/clans/:id", ClanLive.Show, :show
       live "/clans/:id/edit", ClanLive.Form, :edit
       live "/clans/:id/events", EventLive.Index, :index

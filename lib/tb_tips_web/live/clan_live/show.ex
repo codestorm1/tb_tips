@@ -21,8 +21,9 @@ defmodule TbTipsWeb.ClanLive.Show do
       </.header>
 
       <.list>
-        <:item title="Name">{@clan.name}</:item>
         <:item title="Kingdom">{@clan.kingdom}</:item>
+        <:item title="Abbreviation">{@clan.abbr}</:item>
+        <:item title="Name">{@clan.name}</:item>
         <:item title="Invite Key">{@clan.invite_key}</:item>
       </.list>
     </Layouts.app>

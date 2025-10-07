@@ -4,6 +4,7 @@ defmodule TbTips.Clans.Clan do
 
   schema "clans" do
     field :name, :string
+    field :abbr, :string
     field :kingdom, :string
     field :invite_key, :string
 
@@ -15,7 +16,12 @@ defmodule TbTips.Clans.Clan do
   @doc false
   def changeset(clan, attrs) do
     clan
-    |> cast(attrs, [:name, :kingdom, :invite_key])
-    |> validate_required([:name, :kingdom, :invite_key])
+    |> cast(attrs, [:name, :abbr, :kingdom, :invite_key])
+    |> validate_required([:name, :abbr, :kingdom, :invite_key])
+    |> validate_format(:abbr, ~r/^[A-Z0-9]{3}$/i, message: "must be 3 letters/numbers")
+    |> validate_format(:kingdom, ~r/^[1-9]\d{0,3}$/,
+      message: "must be a number between 1 and 9999"
+    )
+    |> update_change(:abbr, &String.upcase/1)
   end
 end

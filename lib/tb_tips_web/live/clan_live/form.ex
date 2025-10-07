@@ -14,8 +14,9 @@ defmodule TbTipsWeb.ClanLive.Form do
       </.header>
 
       <.form for={@form} id="clan-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:kingdom]} type="text" label="Kingdom" />
+        <.input field={@form[:abbr]} type="text" label="Abbreviation" />
+        <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:invite_key]} type="text" label="Invite key" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Clan</.button>

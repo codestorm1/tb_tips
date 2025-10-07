@@ -97,6 +97,78 @@ defmodule TbTips.Clans do
     :ok
   end
 
+  def search_query(opts) do
+    base =
+      from c in Clan,
+        order_by: [asc: c.kingdom, asc: c.abbr, asc: c.name]
+
+    base =
+      case opts[:kingdom] do
+        nil ->
+          base
+
+        "" ->
+          base
+
+        k when is_binary(k) ->
+          from c in base, where: c.kingdom == ^String.trim(k)
+
+        k when is_integer(k) ->
+          from c in base, where: c.kingdom == ^Integer.to_string(k)
+
+        _ ->
+          base
+      end
+
+    base =
+      case opts[:abbr] do
+        nil -> base
+        "" -> base
+        abbr -> from c in base, where: ilike(c.abbr, ^abbr)
+      end
+
+    base =
+      case opts[:name] do
+        nil -> base
+        "" -> base
+        name -> from c in base, where: ilike(c.name, ^"%#{name}%")
+      end
+
+    base
+  end
+
+  def search_clans(kingdom, abbr, name) do
+    query = from(c in Clan)
+
+    query =
+      if kingdom != "" do
+        from(c in query, where: c.kingdom == ^kingdom)
+      else
+        query
+      end
+
+    query =
+      if abbr != "" do
+        from(c in query, where: ilike(c.abbr, ^abbr))
+      else
+        query
+      end
+
+    query =
+      if name != "" do
+        search_term = "%#{name}%"
+        from(c in query, where: ilike(c.name, ^search_term))
+      else
+        query
+      end
+
+    from(c in query,
+      order_by: [asc: c.kingdom, asc: c.abbr],
+      limit: 50
+    )
+    |> Repo.all()
+  end
+
   # Private helper to generate random keys
   defp generate_random_key do
     :crypto.strong_rand_bytes(16)
