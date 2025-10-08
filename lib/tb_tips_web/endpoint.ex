@@ -17,8 +17,9 @@ defmodule TbTipsWeb.Endpoint do
     same_site: "Lax"
   ]
 
+  # The websocket timeout setting helps keep fly.io costs down by timing out connections so that the instance can be suspended
   socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]],
+    websocket: [connect_info: [session: @session_options], timeout: 30_000],
     longpoll: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
