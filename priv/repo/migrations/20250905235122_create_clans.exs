@@ -11,8 +11,9 @@ defmodule TbTips.Repo.Migrations.CreateClans do
       timestamps()
     end
 
-    create unique_index(:clans, [:kingdom, :abbr])
+    create index(:clans, [:kingdom, :abbr])
     create index(:clans, ["lower(name)"])
+    create unique_index(:clans, [:invite_key])
 
     execute("""
     ALTER TABLE clans
