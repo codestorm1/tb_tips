@@ -13,9 +13,10 @@ Tue Sept 30
 * Account settings
 * CRUD events
 * Time localization
+* Search or create clan
 
 ### TODO
-* Search or create clan
+* invite key for private clans
 * Restrict clan registering
 * authz - restrict clan editing
 * authz - restrict event editing

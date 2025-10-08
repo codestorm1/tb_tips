@@ -33,7 +33,7 @@ defmodule TbTipsWeb.ClanLive.Join do
             {:ok,
              socket
              |> put_flash(:info, "You're already a member of #{clan.name}")
-             |> redirect(to: ~p"/clans/#{clan.id}/")}
+             |> redirect(to: ~p"/clans/#{clan.id}")}
 
           # User logged in but not a member - show join confirmation
           true ->
