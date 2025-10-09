@@ -20,7 +20,7 @@ defmodule TbTipsWeb.DashboardLive do
     <div class="max-w-5xl mx-auto px-4 py-8">
       <.header>
         Welcome back, {@current_scope.user.display_name}
-        <:subtitle>Your upcoming battle events</:subtitle>
+        <:subtitle>Your upcoming events</:subtitle>
       </.header>
 
       <div class="mt-8">

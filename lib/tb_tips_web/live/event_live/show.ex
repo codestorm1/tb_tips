@@ -5,7 +5,7 @@ defmodule TbTipsWeb.EventLive.Show do
   alias TbTips.Clans
 
   @impl true
-  def mount(%{"clan_id" => clan_id, "event_id" => event_id}, _session, socket) do
+  def mount(%{"id" => clan_id, "event_id" => event_id}, _session, socket) do
     case Clans.get_clan(clan_id) do
       nil ->
         dbg(nil)
@@ -24,7 +24,7 @@ defmodule TbTipsWeb.EventLive.Show do
           {:ok,
            socket
            |> put_flash(:error, "Event not found")
-           |> redirect(to: ~p"/clans/#{clan.id}//events")}
+           |> redirect(to: ~p"/clans/#{clan.id}/events")}
         else
           {:ok,
            socket

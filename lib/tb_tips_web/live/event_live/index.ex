@@ -57,10 +57,11 @@ defmodule TbTipsWeb.EventLive.Index do
           <.link
             :if={@is_admin}
             navigate={~p"/clans/#{@clan.id}/events/new"}
-            class="btn btn-primary"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded"
           >
             + New Event
           </.link>
+
           <%!-- <.link navigate={~p"/clans/#{@clan.id}"} class="btn btn-ghost">← Back to Clan</.link> --%>
         </div>
       </div>

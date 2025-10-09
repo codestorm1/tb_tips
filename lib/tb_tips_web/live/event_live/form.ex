@@ -7,7 +7,7 @@ defmodule TbTipsWeb.EventLive.Form do
   alias TbTips.Events.Event
 
   @impl true
-  def mount(%{"clan_id" => clan_id} = params, _session, socket) do
+  def mount(%{"id" => clan_id} = params, _session, socket) do
     case socket.assigns.current_scope do
       nil ->
         {:ok,
@@ -19,12 +19,11 @@ defmodule TbTipsWeb.EventLive.Form do
         socket = assign_new(socket, :user_tz, fn -> nil end)
         clan = Clans.get_clan!(clan_id)
 
-        # Check authorization - only clan admins can manage events
         if not ClanMemberships.has_clan_role?(user.id, clan.id, :admin) do
           {:ok,
            socket
-           |> put_flash(:error, "You don't have permission to manage events")
-           |> redirect(to: ~p"/clans/#{clan.id}//events")}
+           |> assign(:error, "You don't have permission to manage events for this clan")
+           |> assign(:clan, clan)}
         else
           {event, changeset, page_title, live_action} =
             case params do
@@ -57,50 +56,74 @@ defmodule TbTipsWeb.EventLive.Form do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <div id="event-form-page" phx-hook="TzSender">
-        <.header>
-          {@page_title}
-          <:subtitle>for {@clan.name}</:subtitle>
-          <:actions>
-            <.button navigate={~p"/clans/#{@clan.id}/events"}>
-              <.icon name="hero-arrow-left" /> Back
-            </.button>
-          </:actions>
-        </.header>
-
-        <.form for={@form} id="event-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:event_type]} type="text" label="Event type" />
-          <.input field={@form[:description]} type="textarea" label="Description" />
-          <.input field={@form[:created_by_name]} type="text" label="Your name" />
-
-          <div class="space-y-1">
-            <label for="start_time_local" class="block text-sm font-medium text-gray-700">
-              Start time
-            </label>
-
-            <input
-              type="datetime-local"
-              id="start_time_local"
-              name="event[start_time_local]"
-              value={local_input_value(@event.start_time, @user_tz)}
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-            />
-
-            <div class="mt-1 text-xs text-gray-600">
-              Time in {@user_tz || "Local"}
+      <%= if assigns[:error] do %>
+        <div class="rounded-lg bg-red-50 p-4 mt-8 max-w-2xl mx-auto">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <.icon name="hero-x-circle" class="h-5 w-5 text-red-400" />
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Access Denied</h3>
+              <div class="mt-2 text-sm text-red-700">
+                {@error}
+              </div>
+              <div class="mt-4">
+                <.link
+                  navigate={~p"/dashboard"}
+                  class="text-sm font-medium text-red-800 hover:underline"
+                >
+                  ← Back to Dashboard
+                </.link>
+              </div>
             </div>
           </div>
+        </div>
+      <% else %>
+        <div id="event-form-page" phx-hook="TzSender">
+          <.header>
+            {@page_title}
+            <:subtitle>for {@clan.name}</:subtitle>
+            <:actions>
+              <.button navigate={~p"/clans/#{@clan.id}/events"}>
+                <.icon name="hero-arrow-left" /> Back
+              </.button>
+            </:actions>
+          </.header>
 
-          <footer class="mt-4 flex gap-2">
-            <.button variant="primary" phx-disable-with="Saving...">
-              <.icon name="hero-check" /> Save Event
-            </.button>
-            <.button navigate={~p"/clans/#{@clan.id}/events"} type="button">
-              Cancel
-            </.button>
-          </footer>
-        </.form>
-      </div>
+          <.form for={@form} id="event-form" phx-change="validate" phx-submit="save" class="space-y-4">
+            <.input field={@form[:event_type]} type="text" label="Event type" />
+            <.input field={@form[:description]} type="textarea" label="Description" />
+            <.input field={@form[:created_by_name]} type="text" label="Your name" />
+
+            <div class="space-y-1">
+              <label for="start_time_local" class="block text-sm font-medium text-gray-700">
+                Start time
+              </label>
+
+              <input
+                type="datetime-local"
+                id="start_time_local"
+                name="event[start_time_local]"
+                value={local_input_value(@event.start_time, @user_tz)}
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              />
+
+              <div class="mt-1 text-xs text-gray-600">
+                Time in {@user_tz || "Local"}
+              </div>
+            </div>
+
+            <footer class="mt-4 flex gap-2">
+              <.button variant="primary" phx-disable-with="Saving...">
+                <.icon name="hero-check" /> Save Event
+              </.button>
+              <.button navigate={~p"/clans/#{@clan.id}/events"} type="button">
+                Cancel
+              </.button>
+            </footer>
+          </.form>
+        </div>
+      <% end %>
     </Layouts.app>
     """
   end

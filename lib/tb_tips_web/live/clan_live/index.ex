@@ -29,7 +29,7 @@ defmodule TbTipsWeb.ClanLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/clans/#{clan.id}/"}>Show</.link>
           </div>
-          <.link navigate={~p"/clans/#{clan.id}//edit"}>Edit</.link>
+          <.link navigate={~p"/clans/#{clan.id}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, clan}}>
           <.link
