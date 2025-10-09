@@ -1,4 +1,3 @@
-
 <div class="min-h-screen flex flex-col">
   <!-- Hero Section -->
   <div class="flex-1 flex items-center justify-center px-4 py-16">
@@ -6,18 +5,45 @@
       <h1 class="text-5xl font-bold text-gray-900 mb-4">
         Coordinate Your Battle Events
       </h1>
-      <p class="text-xl text-gray-600 mb-12">
+      <p class="text-xl text-gray-600 mb-8">
         Schedule and track events across your Total Battle clans
       </p>
+
+      <!-- Invite Key Input -->
+      <div class="max-w-md mx-auto mb-12">
+        <form action="/join-redirect" method="post" class="space-y-3">
+          <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+          <div class="flex gap-2">
+            <input
+              type="text"
+              name="invite_key"
+              placeholder="Enter invite key"
+              autocomplete="off"
+              required
+              class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+            />
+            <button
+              type="submit"
+              class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+            >
+              Join
+            </button>
+          </div>
+        </form>
+      </div>
       
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-        <a href={~p"/clans/search"} 
-           class="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition">
-          Find a Clan
+        <a
+          href={~p"/clans/search"}
+          class="px-8 py-4 bg-gray-100 text-gray-900 text-lg font-semibold rounded-lg hover:bg-gray-200 transition"
+        >
+          Search Clans
         </a>
-        <a href={~p"/users/register"} 
-           class="px-8 py-4 bg-gray-200 text-gray-900 text-lg font-semibold rounded-lg hover:bg-gray-300 transition">
+        <a
+          href={~p"/users/register"}
+          class="px-8 py-4 bg-gray-100 text-gray-900 text-lg font-semibold rounded-lg hover:bg-gray-200 transition"
+        >
           Create New Clan
         </a>
       </div>

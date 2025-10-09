@@ -17,18 +17,19 @@ alias TbTips.Clans.Clan
 alias TbTips.Events.Event
 
 # Clear existing data (optional - comment out if you want to keep existing data)
-Repo.delete_all(Event)
-Repo.delete_all(ClanMembership)
-Repo.delete_all(Clan)
-Repo.delete_all(User)
+# Repo.delete_all(Event)
+# Repo.delete_all(ClanMembership)
+# Repo.delete_all(Clan)
+# Repo.delete_all(User)
 
 IO.puts("Creating users...")
 
-# Create test users
+# Create test users with passwords
 user1 =
   Repo.insert!(%User{
     email: "alice@example.com",
     display_name: "Alice",
+    hashed_password: Bcrypt.hash_pwd_salt("password123"),
     confirmed_at: DateTime.utc_now()
   })
 
@@ -36,6 +37,7 @@ user2 =
   Repo.insert!(%User{
     email: "bob@example.com",
     display_name: "Bob",
+    hashed_password: Bcrypt.hash_pwd_salt("password123"),
     confirmed_at: DateTime.utc_now()
   })
 
@@ -43,6 +45,7 @@ user3 =
   Repo.insert!(%User{
     email: "charlie@example.com",
     display_name: "Charlie",
+    hashed_password: Bcrypt.hash_pwd_salt("password123"),
     confirmed_at: DateTime.utc_now()
   })
 
@@ -275,7 +278,7 @@ IO.puts("""
 
 ✅ Seeds completed!
 
-Test users created:
+Test users created (password: password123):
 - alice@example.com (Alice)
 - bob@example.com (Bob)
 - charlie@example.com (Charlie)
@@ -284,5 +287,5 @@ Clans created: #{length(clans)} clans from K160 and K168
 First 3 clans:
 #{Enum.map_join(Enum.take(clans, 3), "\n", fn c -> "- #{c.name} (K#{c.kingdom}-#{c.abbr}) - invite: #{c.invite_key}" end)}
 
-Use magic link authentication to log in as any of these users.
+Use email + password to log in.
 """)

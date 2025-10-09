@@ -8,4 +8,9 @@ defmodule TbTipsWeb.PageController do
       render(conn, :landing)
     end
   end
+
+  def join_redirect(conn, %{"invite_key" => invite_key}) do
+    cleaned_key = String.trim(invite_key) |> String.upcase()
+    redirect(conn, to: ~p"/join/#{cleaned_key}")
+  end
 end
